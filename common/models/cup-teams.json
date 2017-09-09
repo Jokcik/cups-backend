@@ -1,0 +1,57 @@
+{
+  "name": "cup_teams",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true,
+      "index": {
+        "unique": true
+      }
+    },
+    "ei_creator": {
+      "type": "number",
+      "required": true
+    },
+    "status": {
+      "type": "number",
+      "default": 0
+    },
+    "participants": {
+      "type": "number",
+      "default": 0
+    },
+    "logo": {
+      "type": "string"
+    },
+    "chat": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "cups": {
+      "type": "hasMany",
+      "model": "cup",
+      "foreignKey": "participant_id",
+      "through": "cup_participants"
+    },
+    "cupUsers": {
+      "type": "hasMany",
+      "model": "cup_users",
+      "foreignKey": "team_id",
+      "through": "cup_teams_players"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

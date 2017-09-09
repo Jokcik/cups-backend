@@ -1,0 +1,37 @@
+{
+  "name": "cup_teams_players",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "user_id": {
+      "type": "number",
+      "required": true
+    },
+    "team_id": {
+      "type": "number",
+      "required": true
+    },
+    "status": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "validations": [],
+  "relations": {
+    "cupTeams": {
+      "type": "belongsTo",
+      "model": "cup_teams",
+      "foreignKey": "team_id"
+    },
+    "cupUsers": {
+      "type": "belongsTo",
+      "model": "cup_users",
+      "foreignKey": "user_id"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

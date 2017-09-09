@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "cup": {
+    "dataSource": "mongoDs"
+  },
+  "cup_teams": {
+    "dataSource": "mongoDs",
+    "public": true
+  },
+  "cup_teams_players": {
+    "dataSource": "mongoDs",
+    "public": false
+  },
+  "cup_participants": {
+    "dataSource": "mongoDs",
+    "public": false
+  },
+  "cup_users": {
+    "dataSource": "mongoDs",
+    "public": true
+  }
+}

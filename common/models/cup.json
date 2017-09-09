@@ -1,0 +1,103 @@
+{
+  "name": "cup",
+  "base": "PersistedModel",
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true,
+      "index": {
+        "unique": true
+      }
+    },
+    "game": {
+      "type": {
+        "id": "number",
+        "team_size": "number",
+        "maps": []
+      },
+      "required": true
+    },
+    "start": {
+      "type": "date",
+      "required": true
+    },
+    "logo": {
+      "type": "string"
+    },
+    "ei_creator": {
+      "type": "number",
+      "required": true
+    },
+    "ei_created": {
+      "type": "date",
+      "required": true
+    },
+    "deleted": {
+      "type": "boolean",
+      "default": false
+    },
+    "hidden": {
+      "type": "boolean",
+      "default": false
+    },
+    "invites": {
+      "type": "boolean",
+      "default": false
+    },
+    "prize_pool": {
+      "type": {
+        "places": "number",
+        "amount": "number",
+        "currency": "string",
+        "items": [],
+        "site_rate": {
+          "type": "number",
+          "default": 10
+        },
+        "creator_rate": {
+          "type": "number",
+          "default": 10
+        }
+      },
+      "required": true
+    },
+    "closed": {
+      "type": "boolean",
+      "default": false
+    },
+    "chat": {
+      "type": "number"
+    },
+    "grid": {
+      "type": "any"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "cupTeams": {
+      "type": "hasMany",
+      "model": "cup_teams",
+      "foreignKey": "cup_id",
+      "through": "cup_participants"
+    },
+    "cupUsers": {
+      "type": "hasMany",
+      "model": "cup_users",
+      "foreignKey": "cup_id",
+      "through": "cup_participants"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
