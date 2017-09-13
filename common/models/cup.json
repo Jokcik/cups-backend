@@ -5,10 +5,6 @@
     "validateUpsert": true
   },
   "properties": {
-    "title": {
-      "type": "string",
-      "required": true
-    },
     "description": {
       "type": "string",
       "required": true
@@ -19,14 +15,6 @@
       "index": {
         "unique": true
       }
-    },
-    "game": {
-      "type": {
-        "id": "number",
-        "team_size": "number",
-        "maps": []
-      },
-      "required": true
     },
     "start": {
       "type": "date",
@@ -85,17 +73,13 @@
   },
   "validations": [],
   "relations": {
-    "cupTeams": {
-      "type": "hasMany",
-      "model": "cup_teams",
-      "foreignKey": "cup_id",
-      "through": "cup_participants"
+    "participants": {
+      "type": "hasAndBelongsToMany",
+      "model": "participants"
     },
-    "cupUsers": {
-      "type": "hasMany",
-      "model": "cup_users",
-      "foreignKey": "cup_id",
-      "through": "cup_participants"
+    "games": {
+      "type": "belongsTo",
+      "model": "games"
     }
   },
   "acls": [],

@@ -1,0 +1,26 @@
+{
+  "name": "games",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "team_size": {
+      "type": "number",
+      "default": 1
+    },
+    "maps": {
+      "type": []
+    }
+  },
+  "validations": [],
+  "relations": {
+    "cups": {
+      "type": "hasMany",
+      "model": "cup"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

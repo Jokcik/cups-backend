@@ -1,5 +1,5 @@
 {
-  "name": "cup_teams",
+  "name": "teams",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
@@ -39,17 +39,16 @@
   },
   "validations": [],
   "relations": {
-    "cups": {
-      "type": "hasMany",
-      "model": "cup",
-      "foreignKey": "participant_id",
-      "through": "cup_participants"
+    "participants": {
+      "type": "belongsTo",
+      "model": "participants"
     },
-    "cupUsers": {
+    "users": {
       "type": "hasMany",
-      "model": "cup_users",
+      "model": "users",
       "foreignKey": "team_id",
-      "through": "cup_teams_players"
+      "through": "teams_players_link",
+      "keyThrough": "user_id"
     }
   },
   "acls": [],

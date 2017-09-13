@@ -1,5 +1,5 @@
 {
-  "name": "cup_teams_players",
+  "name": "teams_players_link",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
@@ -20,18 +20,7 @@
     }
   },
   "validations": [],
-  "relations": {
-    "cupTeams": {
-      "type": "belongsTo",
-      "model": "cup_teams",
-      "foreignKey": "team_id"
-    },
-    "cupUsers": {
-      "type": "belongsTo",
-      "model": "cup_users",
-      "foreignKey": "user_id"
-    }
-  },
+  "relations": {},
   "acls": [],
   "methods": {}
 }

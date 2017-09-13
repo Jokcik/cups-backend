@@ -1,0 +1,33 @@
+{
+  "name": "users",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "nickname": {
+      "type": "string",
+      "required": true
+    },
+    "logo": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "participants": {
+      "type": "belongsTo",
+      "model": "participants"
+    },
+    "teams": {
+      "type": "hasMany",
+      "model": "teams",
+      "foreignKey": "user_id",
+      "through": "teams_players_link",
+      "keyThrough": "team_id"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

@@ -16,19 +16,23 @@
   "cup": {
     "dataSource": "mongoDs"
   },
-  "cup_teams": {
+  "teams": {
     "dataSource": "mongoDs",
     "public": true
   },
-  "cup_teams_players": {
+  "teams_players_link": {
     "dataSource": "mongoDs",
     "public": false
   },
-  "cup_participants": {
+  "participants": {
     "dataSource": "mongoDs",
-    "public": false
+    "public": true
   },
-  "cup_users": {
+  "users": {
+    "dataSource": "mongoDs",
+    "public": true
+  },
+  "games": {
     "dataSource": "mongoDs",
     "public": true
   }
