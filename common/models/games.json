@@ -15,12 +15,7 @@
     }
   },
   "validations": [],
-  "relations": {
-    "cups": {
-      "type": "hasMany",
-      "model": "cup"
-    }
-  },
+  "relations": {},
   "acls": [],
   "methods": {}
 }

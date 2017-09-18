@@ -9,6 +9,9 @@
       "type": "string",
       "required": true
     },
+    "type": {
+      "type": "number"
+    },
     "url": {
       "type": "string",
       "required": true,
@@ -44,20 +47,7 @@
       "default": false
     },
     "prize_pool": {
-      "type": {
-        "places": "number",
-        "amount": "number",
-        "currency": "string",
-        "items": [],
-        "site_rate": {
-          "type": "number",
-          "default": 10
-        },
-        "creator_rate": {
-          "type": "number",
-          "default": 10
-        }
-      },
+      "type": "prize_pool",
       "required": true
     },
     "closed": {
@@ -69,14 +59,13 @@
     },
     "grid": {
       "type": "any"
+    },
+    "participantsIds": {
+      "type": []
     }
   },
   "validations": [],
   "relations": {
-    "participants": {
-      "type": "hasAndBelongsToMany",
-      "model": "participants"
-    },
     "games": {
       "type": "belongsTo",
       "model": "games"

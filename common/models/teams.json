@@ -38,19 +38,7 @@
     }
   },
   "validations": [],
-  "relations": {
-    "participants": {
-      "type": "belongsTo",
-      "model": "participants"
-    },
-    "users": {
-      "type": "hasMany",
-      "model": "users",
-      "foreignKey": "team_id",
-      "through": "teams_players_link",
-      "keyThrough": "user_id"
-    }
-  },
+  "relations": {},
   "acls": [],
   "methods": {}
 }

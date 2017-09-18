@@ -16,16 +16,13 @@
   },
   "validations": [],
   "relations": {
-    "participants": {
-      "type": "belongsTo",
-      "model": "participants"
-    },
-    "teams": {
-      "type": "hasMany",
-      "model": "teams",
-      "foreignKey": "user_id",
-      "through": "teams_players_link",
-      "keyThrough": "team_id"
+    "teamsList": {
+      "type": "embedsMany",
+      "model": "team_relation_model",
+      "property": "teams",
+      "scope": {
+        "include": "teams"
+      }
     }
   },
   "acls": [],

@@ -20,14 +20,6 @@
     "dataSource": "mongoDs",
     "public": true
   },
-  "teams_players_link": {
-    "dataSource": "mongoDs",
-    "public": false
-  },
-  "participants": {
-    "dataSource": "mongoDs",
-    "public": true
-  },
   "users": {
     "dataSource": "mongoDs",
     "public": true
@@ -35,5 +27,13 @@
   "games": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "prize_pool": {
+    "dataSource": null,
+    "public": false
+  },
+  "team_relation_model": {
+    "dataSource": "transient",
+    "public": false
   }
 }

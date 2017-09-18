@@ -1,0 +1,21 @@
+{
+  "name": "team_relation_model",
+  "base": "Model",
+  "idInjection": false,
+  "excludeBaseProperties": ["id"],
+  "properties": {
+    "status": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "validations": [],
+  "relations": {
+    "teams": {
+      "type": "belongsTo",
+      "model": "teams"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
