@@ -38,7 +38,15 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "userList": {
+      "type": "embedsMany",
+      "model": "user_relation",
+      "scope": {
+        "include": "user"
+      }
+    }
+  },
   "acls": [],
   "methods": {}
 }

@@ -60,9 +60,7 @@
     "grid": {
       "type": "any"
     },
-    "participantsIds": {
-      "type": []
-    }
+    "participantsIds": []
   },
   "validations": [],
   "relations": {

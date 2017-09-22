@@ -32,7 +32,7 @@
     "dataSource": null,
     "public": false
   },
-  "team_relation_model": {
+  "user_relation": {
     "dataSource": "transient",
     "public": false
   }

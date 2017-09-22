@@ -1,19 +1,19 @@
 {
-  "name": "team_relation_model",
+  "name": "user_relation",
   "base": "Model",
   "idInjection": false,
   "excludeBaseProperties": ["id"],
   "properties": {
-    "status": {
+    "joined": {
       "type": "number",
       "default": 0
     }
   },
   "validations": [],
   "relations": {
-    "teams": {
+    "user": {
       "type": "belongsTo",
-      "model": "teams"
+      "model": "users"
     }
   },
   "acls": [],

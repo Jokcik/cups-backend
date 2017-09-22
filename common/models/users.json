@@ -15,16 +15,7 @@
     }
   },
   "validations": [],
-  "relations": {
-    "teamsList": {
-      "type": "embedsMany",
-      "model": "team_relation_model",
-      "property": "teams",
-      "scope": {
-        "include": "teams"
-      }
-    }
-  },
+  "relations": {},
   "acls": [],
   "methods": {}
 }
