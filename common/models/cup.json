@@ -1,72 +1,21 @@
 {
-  "name": "cup",
+  "name": "Cup",
   "base": "PersistedModel",
-  "options": {
-    "validateUpsert": true
-  },
+  "idInjection": true,
   "properties": {
-    "description": {
+    "title": {
       "type": "string",
       "required": true
-    },
-    "type": {
-      "type": "number"
-    },
-    "url": {
-      "type": "string",
-      "required": true,
-      "index": {
-        "unique": true
-      }
-    },
-    "start": {
-      "type": "date",
-      "required": true
-    },
-    "logo": {
-      "type": "string"
-    },
-    "ei_creator": {
-      "type": "number",
-      "required": true
-    },
-    "ei_created": {
-      "type": "date",
-      "required": true
-    },
-    "deleted": {
-      "type": "boolean",
-      "default": false
-    },
-    "hidden": {
-      "type": "boolean",
-      "default": false
-    },
-    "invites": {
-      "type": "boolean",
-      "default": false
-    },
-    "prize_pool": {
-      "type": "prize_pool",
-      "required": true
-    },
-    "closed": {
-      "type": "boolean",
-      "default": false
-    },
-    "chat": {
-      "type": "number"
-    },
-    "grid": {
-      "type": "any"
-    },
-    "participantsIds": []
+    }
   },
   "validations": [],
   "relations": {
-    "games": {
-      "type": "belongsTo",
-      "model": "games"
+    "players": {
+      "type": "embedsMany",
+      "model": "PlayerLink",
+      "scope": {
+        "include": "player"
+      }
     }
   },
   "acls": [],

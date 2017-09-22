@@ -1,17 +1,14 @@
 {
-  "name": "games",
+  "name": "Player",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "team_size": {
-      "type": "number",
-      "default": 1
-    },
-    "maps": {
-      "type": []
+    "nickname": {
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],

@@ -1,17 +1,14 @@
 {
-  "name": "users",
+  "name": "Team",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "nickname": {
+    "title": {
       "type": "string",
       "required": true
-    },
-    "logo": {
-      "type": "string"
     }
   },
   "validations": [],

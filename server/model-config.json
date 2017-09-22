@@ -13,26 +13,19 @@
       "./mixins"
     ]
   },
-  "cup": {
-    "dataSource": "mongoDs"
-  },
-  "teams": {
+  "Cup": {
     "dataSource": "mongoDs",
     "public": true
   },
-  "users": {
+  "Player": {
     "dataSource": "mongoDs",
     "public": true
   },
-  "games": {
+  "Team": {
     "dataSource": "mongoDs",
     "public": true
   },
-  "prize_pool": {
-    "dataSource": null,
-    "public": false
-  },
-  "user_relation": {
+  "PlayerLink": {
     "dataSource": "transient",
     "public": false
   }

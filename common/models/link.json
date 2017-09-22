@@ -1,0 +1,23 @@
+{
+  "name": "PlayerLink",
+  "base": "Model",
+  "idInjection": true,
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "player": {
+      "type": "belongsTo",
+      "polymorphic": {
+        "idType": "string"
+      },
+      "properties": {
+        "name": "name"
+      },
+      "options": {
+        "invertProperties": true
+      }
+    }
+  },
+  "acls": [],
+  "methods": []
+}
