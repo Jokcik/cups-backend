@@ -3,9 +3,7 @@ import {CreateUserDto} from './dto/create-user.dto';
 import {UsersService} from './users.service';
 import {User} from './interfaces/user.interface';
 import {Schema} from 'mongoose';
-import {TeamsService} from '../teams/teams.service';
 import {Team} from '../teams/interfaces/team.interface';
-import * as passport from 'passport';
 
 @Controller('users')
 export class UsersController {

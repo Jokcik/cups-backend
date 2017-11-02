@@ -18,14 +18,14 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userModel.find().exec();
+    return await this.userModel.find();
   }
 
   async findOne(id: Schema.Types.ObjectId): Promise<User> {
-    return await this.userModel.findOne({_id: id}).exec();
+    return await this.userModel.findById(id);
   }
 
   async findTeams(id: Schema.Types.ObjectId): Promise<Team[]> {
-    return await this.teamModel.find({'users.user': {$in: [id]}}).exec();
+    return await this.teamModel.find({'users.user': {$in: [id]}});
   }
 }

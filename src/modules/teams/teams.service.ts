@@ -2,7 +2,7 @@ import {Model, Schema} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
 import {Team} from './interfaces/team.interface';
 import {CreateTeamDto} from './dto/create-team.dto';
-import {TeamModelToken} from '../constants';
+import {TeamModelToken, UserModelName} from '../constants';
 import {User} from '../users/interfaces/user.interface';
 import * as _ from 'lodash'
 
@@ -21,17 +21,28 @@ export class TeamsService {
   }
 
   async create(createTeamDto: CreateTeamDto, user: User): Promise<Team> {
-    Object.assign(createTeamDto, {ei_creator: user.id});
-    const createdCat = new this.teamModel(createTeamDto);
-    return await createdCat.save();
+    let users = createTeamDto.users.map(userId => {return {user: userId, joiden: 0}});
+    Object.assign(createTeamDto, {ei_creator: user.id, users});
+    const createdTeam = new this.teamModel(createTeamDto);
+    return await createdTeam.save();
+  }
+
+  private combineUser(team): Team {
+    team.users.forEach((value: any, index) => {
+      team.users[index] = Object.assign({}, value.toObject(), value.user.toObject());
+      delete team.users[index].user;
+    });
+    return team;
   }
 
   async findAll(): Promise<Team[]> {
-    return await this.teamModel.find();
+    return await this.teamModel.find()
   }
 
   async findById(id: Schema.Types.ObjectId | string) {
-    return await this.teamModel.findById(id);
+    return await this.teamModel.findById(id)
+      .populate({path: 'users.user', model: UserModelName})
+      .then(team =>  this.combineUser(team));
   }
 
   async update(id: Schema.Types.ObjectId, createTeamDto: CreateTeamDto): Promise<Team> {
