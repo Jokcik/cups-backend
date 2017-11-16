@@ -6,15 +6,14 @@ import {CupModelToken, TeamModelName, UserModelName} from '../core/constants';
 import {Team} from '../teams/interfaces/team.interface';
 import {User} from '../users/interfaces/user.interface';
 import {PlayersTypes} from './cups.constants';
-import {CupPlayer} from './interfaces/cup-player';
 import {BadRequestException} from '../exception/bad-request.exception';
 import {TeamsService} from '../teams/teams.service';
 import {ForbiddenException} from '../exception/forbidden.exception';
-import {UsersService} from '../users/users.service';
 import {GGUtils} from '../core/gg-utils';
 import {PlayerJoin} from './interfaces/player-join';
-import ObjectId = Schema.Types.ObjectId;
 import {PlayersService} from './players.service';
+import {AUser} from '../authenticate/a-user';
+import ObjectId = Schema.Types.ObjectId;
 
 @Component()
 export class CupsService {
@@ -35,7 +34,7 @@ export class CupsService {
     return cup.ei_creator == id;
   }
 
-  async create(createCupDto: CreateCupDto, user: User): Promise<Cup> {
+  async create(createCupDto: CreateCupDto, user: AUser): Promise<Cup> {
     Object.assign(createCupDto, {ei_creator: user.id, ei_created: Date.now()});
     const createdCup = new this.cupModel(createCupDto);
     return await createdCup.save();
@@ -63,10 +62,13 @@ export class CupsService {
       .populate({path: 'players.id', model: cup.type == PlayersTypes.SOLO ? UserModelName : TeamModelName})
       .execPopulate()
       .then(cup => {
-        cup.lineup.forEach((value: any, index) => {
-          cup.lineup[index] = Object.assign({}, value.toObject(), value.id.toObject());
-          delete (<any>cup.lineup[index]).id;
+        cup.players.forEach(player => {
+          player.lineup.forEach((value: any, index) => {
+            cup.players.lineup[index] = Object.assign({}, value.toObject(), value.id.toObject());
+            delete (<any>cup.players.lineup[index]).id;
+          });
         });
+
 
         return cup;
       });
@@ -80,7 +82,8 @@ export class CupsService {
     return this.cupModel.remove({_id: id})
   }
 
-  async addPlayer(id: ObjectId, currentUser: User, playerJoin: PlayerJoin, isAdmin = false): Promise<(User | Team)[]> {
+  async addPlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
+    let isAdmin = currentUser.isJudjes();
     let cupPlayer = await this.playersService.playerValidate(id, playerJoin, currentUser.id, isAdmin);
 
     return await this.cupModel
@@ -88,7 +91,8 @@ export class CupsService {
       .then(cup => cup.players);
   }
 
-  async removePlayer(id: ObjectId, currentUser: User, playerJoin: PlayerJoin, isAdmin = false): Promise<(User | Team)[]> {
+  async removePlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
+    let isAdmin = currentUser.isJudjes();
     let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 

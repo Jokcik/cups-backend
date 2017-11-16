@@ -18,7 +18,7 @@ export const Roles = (...roles: number[]) => ReflectMetadata('roles', roles);
 
 export const RolesTypes = {
   ALL: 0,
-  CREATOR: 1,
-  JUDGES: 2,
+  JUDGES: 1,
+  CREATOR: 2,
   ADMIN: 3
 };

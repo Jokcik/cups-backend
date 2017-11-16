@@ -6,11 +6,11 @@ import {Model} from 'mongoose';
 import {User} from '../users/interfaces/user.interface';
 import {UserService} from './user.service';
 import Request = Express.Request;
+import {AUser} from './a-user';
 
 @Component()
 export class JwtStrategy extends Strategy {
-  constructor(@Inject(UserModelToken) private readonly userModel: Model<User>,
-              private userService: UserService) {
+  constructor(@Inject(UserModelToken) private readonly userModel: Model<User>) {
     super(
       {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -20,13 +20,11 @@ export class JwtStrategy extends Strategy {
       async (req, payload, next) => await this.verify(req, payload, next)
     );
     passport.use(this);
-    // passport.serializeUser((user: any, done) => {
-    //   done(null, user.id);
-    // });
   }
 
   public async verify(req: Request, payload, done) {
     await this.userModel.findByIdAndUpdate(payload.id, payload, {upsert: true, new: true});
-    done(null, payload);
+    let user = new AUser(payload);
+    done(null, user);
   }
 }

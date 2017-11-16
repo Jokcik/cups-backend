@@ -5,6 +5,8 @@ import {ExecutionContext} from '@nestjs/common/interfaces/execution-context.inte
 import {CupsService} from './cups.service';
 import {RolesTypes} from '../core/constants';
 import * as _ from 'lodash';
+import {AUser} from '../authenticate/a-user';
+import {Cup} from './interfaces/cup.interface';
 
 @Guard()
 export class CupRolesGuard implements CanActivate {
@@ -12,24 +14,43 @@ export class CupRolesGuard implements CanActivate {
               private readonly cupsService: CupsService) {
   }
 
+  private setRoles(user: AUser, cup: Cup = null) {
+    user.roles = RolesTypes.ALL;
+
+    if (cup && this.cupsService.isJudges(cup, user.id)) {
+      user.roles = RolesTypes.CREATOR;
+    }
+
+    if (cup && this.cupsService.isCreator(cup, user.id)) {
+      user.roles = RolesTypes.CREATOR;
+    }
+
+    if (user.admin) {
+      user.roles = RolesTypes.ADMIN;
+    }
+  }
+
   async canActivate(req, context: ExecutionContext): Promise<boolean> {
-    const { parent, handler } = context;
+    const { handler } = context;
 
     const roles = this.reflector.get<number[]>('roles', handler);
-    if (!roles || roles.length == 0 || roles.indexOf(RolesTypes.ALL)) return true;
+    if (!roles || roles.length == 0 || _.includes(roles, RolesTypes.ALL)) return true;
 
-    let user = req.user;
+    let user: AUser = req.user;
     if (req.params && req.params.id) {
       let cup = await this.cupsService.findById(req.params.id);
+      this.setRoles(user, cup);
 
-      if (_.includes(roles, RolesTypes.CREATOR) && this.cupsService.isCreator(cup, user.id))
+      if (_.includes(roles, RolesTypes.JUDGES) && user.isJudjes())
         return true;
 
-      if (_.includes(roles, RolesTypes.JUDGES) && this.cupsService.isJudges(cup, user.id))
+      if (_.includes(roles, RolesTypes.CREATOR) && user.isCreator())
         return true;
 
-      // if (roles.indexOf(RolesTypes.ADMIN))
-      //   return true;
+      if (roles.indexOf(RolesTypes.ADMIN) && user.isAdmin())
+        return true;
+    } else {
+      this.setRoles(user);
     }
 
     return false;
