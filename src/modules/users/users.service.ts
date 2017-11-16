@@ -2,7 +2,7 @@ import {Model, Schema} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
 import {User} from './interfaces/user.interface';
 import {CreateUserDto} from './dto/create-user.dto';
-import {TeamModelToken, UserModelToken} from '../constants';
+import {TeamModelToken, UserModelToken} from '../core/constants';
 import {Team} from '../teams/interfaces/team.interface';
 
 @Component()
@@ -21,7 +21,7 @@ export class UsersService {
     return await this.userModel.find();
   }
 
-  async findOne(id: Schema.Types.ObjectId): Promise<User> {
+  async findById(id: Schema.Types.ObjectId | string): Promise<User> {
     return await this.userModel.findById(id);
   }
 

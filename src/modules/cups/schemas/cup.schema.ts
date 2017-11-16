@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 import {PrizePoolSchema} from './prize-pool.schema';
 import {Schema} from 'mongoose';
 import Mixed = Schema.Types.Mixed;
-import {GameModelName, UserModelName} from '../../constants';
+import {GameModelName, UserModelName} from '../../core/constants';
 
 const Players = new mongoose.Schema({
   id: Schema.Types.ObjectId,

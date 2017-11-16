@@ -3,7 +3,7 @@ import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamsService} from './teams.service';
 import {Team} from './interfaces/team.interface';
 import {Schema} from 'mongoose';
-import {Roles, RolesTypes} from '../constants';
+import {Roles, RolesTypes} from '../core/constants';
 
 @Controller('teams')
 export class TeamsController {

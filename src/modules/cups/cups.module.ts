@@ -7,6 +7,9 @@ import {MiddlewaresConsumer} from '@nestjs/common/interfaces/middlewares';
 import * as passport from 'passport';
 import {AuthModule} from '../authenticate/auth.module';
 import {TeamsModule} from '../teams/teams.module';
+import {UsersModule} from '../users/users.module';
+import {GGUtils} from '../core/gg-utils';
+import {PlayersService} from './players.service';
 
 const routes: any[] = [
   { path: '/cups/*', method: RequestMethod.POST },
@@ -20,11 +23,13 @@ const routes: any[] = [
 ];
 
 @Module({
-  modules: [DatabaseModule, AuthModule, TeamsModule],
+  modules: [DatabaseModule, AuthModule, TeamsModule, UsersModule],
   controllers: [CupsController],
   components: [
+    PlayersService,
     CupsService,
     ...cupsProviders,
+    GGUtils,
   ],
 })
 export class CupsModule implements NestModule {

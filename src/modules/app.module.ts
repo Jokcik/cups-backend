@@ -4,6 +4,7 @@ import {GamesModule} from './games/games.module';
 import {TeamsModule} from './teams/teams.module';
 import {UsersModule} from './users/users.module';
 import {AuthModule} from './authenticate/auth.module';
+import {GGUtils} from './core/gg-utils';
 
 @Module({
   modules: [

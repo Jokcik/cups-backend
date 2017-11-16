@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
 import { GameSchema } from './schemas/game.schema';
-import {DbConnectionToken, GameModelName, GameModelToken} from '../constants';
+import {DbConnectionToken, GameModelName, GameModelToken} from '../core/constants';
 
 export const gamesProviders = [
   {

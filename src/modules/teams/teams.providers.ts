@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
 import { TeamSchema } from './schemas/team.schema';
-import {DbConnectionToken, TeamModelName, TeamModelToken} from '../constants';
+import {DbConnectionToken, TeamModelName, TeamModelToken} from '../core/constants';
 
 export const teamsProviders = [
   {

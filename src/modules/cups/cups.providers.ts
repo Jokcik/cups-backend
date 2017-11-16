@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
 import { CupSchema } from './schemas/cup.schema';
-import {CupModelName, CupModelToken, DbConnectionToken} from '../constants';
+import {CupModelName, CupModelToken, DbConnectionToken} from '../core/constants';
 
 export const cupsProviders = [
   {

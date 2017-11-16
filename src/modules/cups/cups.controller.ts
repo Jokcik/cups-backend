@@ -5,7 +5,9 @@ import {Cup} from './interfaces/cup.interface';
 import {Schema} from 'mongoose';
 import {TeamJoin} from '../teams/interfaces/team-join.interface';
 import {CupRolesGuard} from './cup-roles.guard';
-import {Roles, RolesTypes} from '../constants';
+import {Roles, RolesTypes} from '../core/constants';
+import {PlayerJoin} from './interfaces/player-join';
+import {TeamsRolesGuard} from '../teams/teams-roles.guard';
 
 @Controller('cups')
 @UseGuards(CupRolesGuard)
@@ -14,6 +16,7 @@ export class CupsController {
   }
 
   @Post()
+  @Roles(RolesTypes.ALL)
   async create(@Body() createCupDto: CreateCupDto, @Request() req) {
     return this.cupsService.create(createCupDto, req.user);
   }
@@ -41,13 +44,25 @@ export class CupsController {
   }
 
   @Post(':id/players')
-  async addPlayers(@Param('id') id: Schema.Types.ObjectId, @Body() teamJoin: TeamJoin, @Request() req): Promise<any> {
-    return this.cupsService.addPlayer(id, req.user, teamJoin);
+  async addPlayers(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
+    return this.cupsService.addPlayer(id, req.user, playerJoin);
+  }
+
+  @Post(':id/players/admin')
+  @Roles(RolesTypes.CREATOR, RolesTypes.ADMIN, RolesTypes.JUDGES)
+  async addPlayersAdmin(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
+    return this.cupsService.addPlayer(id, req.user, playerJoin, true);
+  }
+
+  @Delete(':id/players/admin')
+  @Roles(RolesTypes.CREATOR, RolesTypes.ADMIN, RolesTypes.JUDGES)
+  async removePlayersAdmin(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
+    return this.cupsService.removePlayer(id, req.user, playerJoin, true);
   }
 
   @Delete(':id/players')
-  async removePlayers(@Param('id') id: Schema.Types.ObjectId, @Body() teamJoin: TeamJoin, @Request() req): Promise<any> {
-    return this.cupsService.removePlayer(id, req.user, teamJoin);
+  async removePlayers(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
+    return this.cupsService.removePlayer(id, req.user, playerJoin);
   }
 
   @Get(':id/players')

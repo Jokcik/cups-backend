@@ -2,7 +2,7 @@ import {Guard, Param} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import {CanActivate} from '@nestjs/common/interfaces/can-activate.interface';
 import {ExecutionContext} from '@nestjs/common/interfaces/execution-context.interface';
-import {RolesTypes} from '../constants';
+import {RolesTypes} from '../core/constants';
 import * as _ from 'lodash';
 import {TeamsService} from './teams.service';
 
@@ -20,9 +20,9 @@ export class TeamsRolesGuard implements CanActivate {
 
     let user = req.user;
     if (req.params && req.params.id) {
-      let cup = await this.teamsService.findById(req.params.id);
+      let team = await this.teamsService.findById(req.params.id);
 
-      if (_.includes(roles, RolesTypes.CREATOR) && this.teamsService.isCreator(cup, user.id))
+      if (_.includes(roles, RolesTypes.CREATOR) && this.teamsService.isCreator(team, user.id))
         return true;
 
       if (roles.indexOf(RolesTypes.ADMIN) && true)

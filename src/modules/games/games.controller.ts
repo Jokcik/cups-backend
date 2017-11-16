@@ -3,7 +3,7 @@ import {CreateGameDto} from './dto/create-game.dto';
 import {GamesService} from './games.service';
 import {Game} from './interfaces/game.interface';
 import {Schema} from 'mongoose';
-import {Roles, RolesTypes} from '../constants';
+import {Roles, RolesTypes} from '../core/constants';
 import {GameRolesGuard} from './game-roles.guard';
 
 @Controller('games')

@@ -2,7 +2,7 @@ import {Guard, Param} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import {CanActivate} from '@nestjs/common/interfaces/can-activate.interface';
 import {ExecutionContext} from '@nestjs/common/interfaces/execution-context.interface';
-import {RolesTypes} from '../constants';
+import {RolesTypes} from '../core/constants';
 
 @Guard()
 export class GameRolesGuard implements CanActivate {

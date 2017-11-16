@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import {DbConnectionToken} from '../constants';
+import {DbConnectionToken} from '../core/constants';
 
 export const databaseProviders = [
   {

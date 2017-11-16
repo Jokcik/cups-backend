@@ -2,7 +2,7 @@ import {Model, Schema} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
 import {Team} from './interfaces/team.interface';
 import {CreateTeamDto} from './dto/create-team.dto';
-import {TeamModelToken, UserModelName} from '../constants';
+import {TeamModelToken, UserModelName} from '../core/constants';
 import {User} from '../users/interfaces/user.interface';
 import * as _ from 'lodash'
 
@@ -11,13 +11,17 @@ export class TeamsService {
   constructor(@Inject(TeamModelToken) private readonly teamModel: Model<Team>) {
   }
 
-  public isCreator(team: Team, user: User): boolean {
-    return team.ei_creator == user.id;
+  public isCreator(team: Team, userId: string): boolean {
+    return team.ei_creator == userId;
   }
 
   public isTeamsPlayer(team: Team, lineup: string[]) {
-    let inter = _.intersection(team.users.map(value => value.user.toString()), lineup);
+    let inter = _.intersection(team.users.map(value => value._id.toString()), lineup);
     return inter.length == lineup.length;
+  }
+
+  public isCaptainInTeam(team: Team, players: string[]) {
+    return _.includes(players, team.ei_creator);
   }
 
   async create(createTeamDto: CreateTeamDto, user: User): Promise<Team> {
@@ -52,5 +56,4 @@ export class TeamsService {
   async remove(id: Schema.Types.ObjectId): Promise<any> {
     return this.teamModel.remove({_id: id})
   }
-
 }

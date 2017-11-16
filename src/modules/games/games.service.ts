@@ -2,7 +2,7 @@ import {Model, Schema} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
 import {Game} from './interfaces/game.interface';
 import {CreateGameDto} from './dto/create-game.dto';
-import {GameModelToken} from '../constants';
+import {GameModelToken} from '../core/constants';
 import fetch from 'node-fetch';
 
 @Component()

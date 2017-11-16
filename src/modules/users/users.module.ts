@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { usersProviders } from './users.providers';
 import { DatabaseModule } from '../database/database.module';
 import {teamsProviders} from '../teams/teams.providers';
+import {TeamsService} from '../teams/teams.service';
 
 @Module({
   modules: [DatabaseModule],
@@ -11,7 +12,10 @@ import {teamsProviders} from '../teams/teams.providers';
   components: [
     UsersService,
     ...usersProviders,
-    ...teamsProviders
   ],
+  exports: [
+    UsersService,
+    ...usersProviders,
+  ]
 })
 export class UsersModule {}

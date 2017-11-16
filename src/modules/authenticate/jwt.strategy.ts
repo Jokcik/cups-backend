@@ -1,7 +1,7 @@
 import * as passport from 'passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import {Component, Inject} from '@nestjs/common';
-import {UserModelToken} from '../constants';
+import {UserModelToken} from '../core/constants';
 import {Model} from 'mongoose';
 import {User} from '../users/interfaces/user.interface';
 import {UserService} from './user.service';
