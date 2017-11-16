@@ -37,7 +37,7 @@ export class CupRolesGuard implements CanActivate {
     if (!roles || roles.length == 0 || _.includes(roles, RolesTypes.ALL)) return true;
 
     let user: AUser = req.user;
-    if (req.params && req.params.id) {
+    if (req.params && req.params.cupId) {
       let cup = await this.cupsService.findById(req.params.id);
       this.setRoles(user, cup);
 
@@ -47,7 +47,7 @@ export class CupRolesGuard implements CanActivate {
       if (_.includes(roles, RolesTypes.CREATOR) && user.isCreator())
         return true;
 
-      if (roles.indexOf(RolesTypes.ADMIN) && user.isAdmin())
+      if (_.includes(roles, RolesTypes.ADMIN) && user.isAdmin())
         return true;
     } else {
       this.setRoles(user);

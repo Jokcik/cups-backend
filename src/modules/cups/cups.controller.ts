@@ -18,13 +18,13 @@ export class CupsController {
     return await this.cupsService.create(createCupDto, req.user);
   }
 
-  @Put(':id')
+  @Put(':cupId')
   @Roles(RolesTypes.JUDGES)
   async update(@Param('id') id: Schema.Types.ObjectId, @Body() createCupDto: CreateCupDto): Promise<Cup> {
     return this.cupsService.update(id, createCupDto);
   }
 
-  @Delete(':id')
+  @Delete(':cupId')
   @Roles(RolesTypes.JUDGES)
   async remove(@Param('id') id: Schema.Types.ObjectId): Promise<void> {
     return this.cupsService.remove(id);
@@ -35,22 +35,22 @@ export class CupsController {
     return this.cupsService.findAll();
   }
 
-  @Get(':id')
+  @Get(':cupId')
   async findById(@Param('id') id: Schema.Types.ObjectId): Promise<Cup> {
     return this.cupsService.findById(id);
   }
 
-  @Post(':id/players')
+  @Post(':cupId/players')
   async addPlayers(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
     return this.cupsService.addPlayer(id, req.user, playerJoin);
   }
 
-  @Delete(':id/players')
+  @Delete(':cupId/players')
   async removePlayers(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
     return this.cupsService.removePlayer(id, req.user, playerJoin);
   }
 
-  @Get(':id/players')
+  @Get(':cupId/players')
   async findPlayers(@Param('id') id: Schema.Types.ObjectId): Promise<any> {
     return this.cupsService.findPlayers(id);
   }
