@@ -5,6 +5,8 @@ import {ExecutionContext} from '@nestjs/common/interfaces/execution-context.inte
 import {RolesTypes} from '../core/constants';
 import * as _ from 'lodash';
 import {TeamsService} from './teams.service';
+import {AUser} from '../authenticate/a-user';
+import {Team} from './interfaces/team.interface';
 
 @Guard()
 export class TeamsRolesGuard implements CanActivate {
@@ -12,23 +14,43 @@ export class TeamsRolesGuard implements CanActivate {
               private readonly teamsService: TeamsService) {
   }
 
+  private setRoles(user: AUser, team: Team = null) {
+    user.roles = RolesTypes.ALL;
+
+    if (team && this.teamsService.isCreator(team, user.id)) {
+      user.roles = RolesTypes.CREATOR;
+    }
+
+    if (user.admin) {
+      user.roles = RolesTypes.ADMIN;
+    }
+  }
+
   async canActivate(req, context: ExecutionContext): Promise<boolean> {
-    const { parent, handler } = context;
+    let user: AUser = req.user;
+    if (!user) return true;
 
-    const roles = this.reflector.get<number[]>('roles', handler);
-    if (!roles || roles.length == 0 || roles.indexOf(RolesTypes.ALL)) return true;
+    this.setRoles(user);
 
-    let user = req.user;
-    if (req.params && req.params.id) {
-      let team = await this.teamsService.findById(req.params.id);
+    const { handler } = context;
 
-      if (_.includes(roles, RolesTypes.CREATOR) && this.teamsService.isCreator(team, user.id))
-        return true;
+    let roles = this.reflector.get<number[]>('roles', handler);
+    if (!roles) {
+      roles = [];
+    }
 
-      if (roles.indexOf(RolesTypes.ADMIN) && true)
+    let teamId = req.params.id;
+    if (req.params && teamId) {
+      let team = await this.teamsService.findById(teamId);
+      this.setRoles(user, team);
+
+      if (_.includes(roles, RolesTypes.CREATOR) && user.isCreator())
         return true;
     }
 
-    return false;
+    if (_.includes(roles, RolesTypes.ADMIN) && user.isAdmin())
+      return true;
+
+    return roles.length == 0 || _.includes(roles, RolesTypes.ALL);
   }
 }

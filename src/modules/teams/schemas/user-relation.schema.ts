@@ -3,7 +3,7 @@ import {Schema} from 'mongoose';
 import {UserModelName} from '../../core/constants';
 
 export const UserRelationSchema = new mongoose.Schema({
-  joiden: {
+  joined: {
     type: Number,
     default: 0
   },
