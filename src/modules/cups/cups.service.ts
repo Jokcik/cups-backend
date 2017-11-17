@@ -52,8 +52,7 @@ export class CupsService {
   }
 
   async findById(id: ObjectId): Promise<Cup> {
-    let cup = await this.cupModel.findById(id).populate('game').exec();
-
+    let cup = await this.cupModel.findById(id);
     return await this.populatePlayers(cup);
   }
 
@@ -62,13 +61,10 @@ export class CupsService {
       .populate({path: 'players.id', model: cup.type == PlayersTypes.SOLO ? UserModelName : TeamModelName})
       .execPopulate()
       .then(cup => {
-        cup.players.forEach(player => {
-          player.lineup.forEach((value: any, index) => {
-            cup.players.lineup[index] = Object.assign({}, value.toObject(), value.id.toObject());
-            delete (<any>cup.players.lineup[index]).id;
-          });
+        cup.players.forEach((value: any, index) => {
+          cup.players[index] = Object.assign({}, value.toObject(), value.id.toObject());
+          delete (<any>cup.players[index]).id;
         });
-
 
         return cup;
       });
@@ -122,7 +118,7 @@ export class CupsService {
 
     cup.players.forEach(value => {
       if (value.id == player.id) {
-        (<any>value).checkIn = false;
+        (<any>value).checkIn = true;
       }
     });
 

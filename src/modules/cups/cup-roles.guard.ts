@@ -38,11 +38,14 @@ export class CupRolesGuard implements CanActivate {
 
     const { handler } = context;
 
-    const roles = this.reflector.get<number[]>('roles', handler);
-    if (!roles || roles.length == 0 || _.includes(roles, RolesTypes.ALL)) return true;
+    let roles = this.reflector.get<number[]>('roles', handler);
+    if (!roles) {
+      roles = [];
+    }
 
-    if (req.params && req.params.cupId) {
-      let cup = await this.cupsService.findById(req.params.id);
+    let cupId = req.params.cupId;
+    if (req.params && cupId) {
+      let cup = await this.cupsService.findById(cupId);
       this.setRoles(user, cup);
 
       if (_.includes(roles, RolesTypes.JUDGES) && user.isJudjes())
@@ -54,6 +57,7 @@ export class CupRolesGuard implements CanActivate {
       if (_.includes(roles, RolesTypes.ADMIN) && user.isAdmin())
         return true;
     }
-    return false;
+
+    return roles.length == 0 || _.includes(roles, RolesTypes.ALL);
   }
 }
