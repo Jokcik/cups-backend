@@ -15,6 +15,26 @@ export class CupsController {
   constructor(private readonly cupsService: CupsService) {
   }
 
+  @Get('goes')
+  async findCupsGoes(): Promise<Cup[]> {
+    return this.cupsService.findCupsGoes();
+  }
+
+  @Get('closed')
+  async findCupsClosed(): Promise<Cup[]> {
+    return this.cupsService.findCupsClosed();
+  }
+
+  @Get('opened')
+  async findCupsOpened(): Promise<Cup[]> {
+    return this.cupsService.findCupsOpened();
+  }
+
+  @Get('my-cups')
+  async findCupsMyCups(@Request() req): Promise<Cup[]> {
+    return this.cupsService.findMyCups(req.user);
+  }
+
   @Post()
   async create(@Body() createCupDto: CreateCupDto, @Request() req) {
     return await this.cupsService.create(createCupDto, req.user);
@@ -67,7 +87,6 @@ export class CupsController {
     return this.cupsService.checkInPlayer(id, req.user, playerJoin);
   }
 
-
   @Post(':cupId/judge')
   @Roles(RolesTypes.CREATOR)
   async addJudge(@Param('cupId') id: ObjectId, @Body('judge') judge: ObjectId, @Request() req): Promise<any> {
@@ -79,4 +98,6 @@ export class CupsController {
   async removeJudge(@Param('cupId') id: ObjectId, @Body('judge') judge: ObjectId, @Request() req): Promise<any> {
     return this.cupsService.removeJudge(id, judge);
   }
+
+
 }

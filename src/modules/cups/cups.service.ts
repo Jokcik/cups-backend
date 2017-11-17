@@ -157,4 +157,31 @@ export class CupsService {
   async findJudge(id: ObjectId): Promise<User[]> {
     return await this.cupModel.findById(id).populate({path: 'judges', model: UserModelName}).then(cup => cup.judges)
   }
+
+  async findCupsGoes() {
+    return this.cupModel.find()
+      .where('closed', false)
+      .where('start').lt(Date.now());
+  }
+
+  async findCupsClosed() {
+    return this.cupModel.find()
+      .where('closed', true)
+  }
+
+  async findCupsOpened() {
+    return this.cupModel.find()
+      .where('closed', false)
+      .where('start').gt(Date.now());
+  }
+
+  async findMyCups(user: AUser) {
+    if (!user) return [];
+
+    return this.cupModel.find()
+      .or([
+        {ei_creator: user.id},
+        {'players.id': user.id}
+      ])
+  }
 }
