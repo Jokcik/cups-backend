@@ -53,10 +53,10 @@ export class CupRolesGuard implements CanActivate {
 
       if (_.includes(roles, RolesTypes.CREATOR) && user.isCreator())
         return true;
-
-      if (_.includes(roles, RolesTypes.ADMIN) && user.isAdmin())
-        return true;
     }
+
+    if (_.includes(roles, RolesTypes.ADMIN) && user.isAdmin())
+      return true;
 
     return roles.length == 0 || _.includes(roles, RolesTypes.ALL);
   }

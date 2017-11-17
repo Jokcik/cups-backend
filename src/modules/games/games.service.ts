@@ -11,11 +11,11 @@ export class GamesService {
   }
 
   async updateAllGames(): Promise<any> {
-    let games = await fetch('http://localhost:3220/api/4/stream/games?cups=1')
+    let games = await fetch('https://goodgame.ru/api/4/stream/games?filter=cups')
       .then(res => res.json())
       .then(res => res.games);
 
-    let all = games.map(game => this.gameModel.findOneAndUpdate({title: game.title}, game, {upsert: true}));
+    let all = games.map(game => this.gameModel.findOneAndUpdate({title: game.title}, game, {upsert: true, new: true}));
 
     return await Promise.all(all);
   }

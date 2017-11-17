@@ -3,6 +3,8 @@ import { Reflector } from '@nestjs/core';
 import {CanActivate} from '@nestjs/common/interfaces/can-activate.interface';
 import {ExecutionContext} from '@nestjs/common/interfaces/execution-context.interface';
 import {RolesTypes} from '../core/constants';
+import {AUser} from '../authenticate/a-user';
+import * as _ from 'lodash';
 
 @Guard()
 export class GameRolesGuard implements CanActivate {
@@ -10,14 +12,22 @@ export class GameRolesGuard implements CanActivate {
   }
 
   async canActivate(req, context: ExecutionContext): Promise<boolean> {
-    const { parent, handler } = context;
+    let user: AUser = req.user;
+    if (!user) return true;
 
-    const roles = this.reflector.get<number[]>('roles', handler);
-    if (!roles || roles.length == 0 || roles.indexOf(RolesTypes.ALL)) return true;
+    if (user.admin) {
+      user.roles = RolesTypes.ADMIN;
+    }
 
-    if (roles.indexOf(RolesTypes.ADMIN) && true)
-        return true;
+    const { handler } = context;
+    let roles = this.reflector.get<number[]>('roles', handler);
+    if (!roles) {
+      roles = [];
+    }
 
-    return false;
+    if (_.includes(roles, RolesTypes.ADMIN) && user.isAdmin())
+      return true;
+
+    return roles.length == 0 || _.includes(roles, RolesTypes.ALL);
   }
 }
