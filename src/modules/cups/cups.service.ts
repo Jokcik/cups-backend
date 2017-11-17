@@ -96,13 +96,9 @@ export class CupsService {
     let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 
-    if (!isAdmin){
-      if (cup.type == PlayersTypes.TEAM) {
-        let team = await this.teamsService.findById(playerJoin.team);
-        if (!this.teamsService.isCreator(team, currentUser.id)) throw new ForbiddenException();
-      } else {
-        playerJoin = <any>{user: currentUser.id};
-      }
+    await this.playersService.basicValidPlayer(cup, playerJoin, currentUser.id, isAdmin);
+    if (!isAdmin && cup.type != PlayersTypes.TEAM) {
+      playerJoin = <any>{user: currentUser.id};
     }
 
     let value = this.playersService.getPlayerByCupType(cup, playerJoin);
@@ -117,4 +113,19 @@ export class CupsService {
   }
 
 
+  async checkInPlayer(id: ObjectId, user: AUser, playerJoin: PlayerJoin) {
+    let isAdmin = user.isJudjes();
+    let cup = await this.cupModel.findById(id);
+    if (!cup) throw new BadRequestException('invalid cup');
+
+    let player = await this.playersService.basicValidPlayer(cup, playerJoin, user.id, isAdmin);
+
+    cup.players.forEach(value => {
+      if (value.id == player.id) {
+        (<any>value).checkIn = false;
+      }
+    });
+
+    return await this.cupModel.findByIdAndUpdate(id, cup, {new: true});
+  }
 }

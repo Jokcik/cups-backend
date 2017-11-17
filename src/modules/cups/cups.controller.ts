@@ -6,6 +6,7 @@ import {Schema} from 'mongoose';
 import {CupRolesGuard} from './cup-roles.guard';
 import {Roles, RolesTypes} from '../core/constants';
 import {PlayerJoin} from './interfaces/player-join';
+import ObjectId = Schema.Types.ObjectId;
 
 @Controller('cups')
 @UseGuards(CupRolesGuard)
@@ -20,13 +21,13 @@ export class CupsController {
 
   @Put(':cupId')
   @Roles(RolesTypes.JUDGES)
-  async update(@Param('id') id: Schema.Types.ObjectId, @Body() createCupDto: CreateCupDto): Promise<Cup> {
+  async update(@Param('cupId') id: ObjectId, @Body() createCupDto: CreateCupDto): Promise<Cup> {
     return this.cupsService.update(id, createCupDto);
   }
 
   @Delete(':cupId')
   @Roles(RolesTypes.JUDGES)
-  async remove(@Param('id') id: Schema.Types.ObjectId): Promise<void> {
+  async remove(@Param('cupId') id: ObjectId): Promise<void> {
     return this.cupsService.remove(id);
   }
 
@@ -36,22 +37,27 @@ export class CupsController {
   }
 
   @Get(':cupId')
-  async findById(@Param('id') id: Schema.Types.ObjectId): Promise<Cup> {
+  async findById(@Param('cupId') id: ObjectId): Promise<Cup> {
     return this.cupsService.findById(id);
   }
 
   @Post(':cupId/players')
-  async addPlayers(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
+  async addPlayers(@Param('cupId') id: ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
     return this.cupsService.addPlayer(id, req.user, playerJoin);
   }
 
   @Delete(':cupId/players')
-  async removePlayers(@Param('id') id: Schema.Types.ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
+  async removePlayers(@Param('cupId') id: ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
     return this.cupsService.removePlayer(id, req.user, playerJoin);
   }
 
   @Get(':cupId/players')
-  async findPlayers(@Param('id') id: Schema.Types.ObjectId): Promise<any> {
+  async findPlayers(@Param('cupId') id: ObjectId): Promise<any> {
     return this.cupsService.findPlayers(id);
+  }
+
+  @Post(':cupId/check-in')
+  async checkIn(@Param('cupId') id: ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
+    return this.cupsService.checkInPlayer(id, req.user, playerJoin);
   }
 }

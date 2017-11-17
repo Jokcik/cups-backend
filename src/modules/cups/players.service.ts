@@ -10,12 +10,14 @@ import ObjectId = Schema.Types.ObjectId;
 import {CupModelToken} from '../core/constants';
 import {TeamsService} from '../teams/teams.service';
 import {UsersService} from '../users/users.service';
+import {AUser} from '../authenticate/a-user';
+import {Team} from '../teams/interfaces/team.interface';
 
 @Component()
 export class PlayersService {
   constructor(@Inject(CupModelToken) private readonly cupModel: Model<Cup>,
               private readonly teamsService: TeamsService,
-              private readonly usersService: UsersService){
+              private readonly usersService: UsersService) {
   }
 
   public isPlayer(cup: Cup, id: string): boolean {
@@ -23,19 +25,17 @@ export class PlayersService {
   }
 
 
-  public async validPlayerTeam(playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean) {
-    let player = await this.teamsService.findById(playerJoin.team);
-
-    if (!player || !playerJoin.lineup) throw new BadRequestException('invalid team');
-    if (!this.teamsService.isTeamsPlayer(player, playerJoin.lineup)) throw new BadRequestException('Incorrect data');
-    if (!isAdmin && !this.teamsService.isCreator(player, currentUserId)) throw new ForbiddenException();
-    if (!this.teamsService.isCaptainInTeam(player, playerJoin.lineup)) throw new BadRequestException('no captain in team players');
-    return player;
+  public async validPlayerTeam(team: Team, playerJoin: PlayerJoin) {
+    if (!team || !playerJoin.lineup) throw new BadRequestException('invalid team');
+    if (!this.teamsService.isTeamsPlayer(team, playerJoin.lineup)) throw new BadRequestException('Incorrect data');
+    if (!this.teamsService.isCaptainInTeam(team, playerJoin.lineup)) throw new BadRequestException('no captain in team players');
+    return team;
   }
 
   public async validPlayerUser(playerJoin: PlayerJoin) {
-    let player = await this.usersService.findById(playerJoin.user);
-    if (!player) throw new BadRequestException('invalid user id');
+    let user = await this.usersService.findById(playerJoin.user);
+    if (!user) throw new BadRequestException('invalid user id');
+    return user
   }
 
   public getPlayerByCupType(cup: Cup, player: PlayerJoin, checkIn = false): CupPlayer {
@@ -51,10 +51,10 @@ export class PlayersService {
     let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 
+    let player = await this.basicValidPlayer(cup, playerJoin, currentUserId, isAdmin);
+
     if (cup.type == PlayersTypes.TEAM) {
-      await this.validPlayerTeam(playerJoin, currentUserId, isAdmin);
-    } else {
-      await this.validPlayerUser(playerJoin);
+      await this.validPlayerTeam(player, playerJoin);
     }
 
     let cupPlayer = this.getPlayerByCupType(cup, playerJoin, isAdmin);
@@ -64,5 +64,21 @@ export class PlayersService {
     }
 
     return cupPlayer;
+  }
+
+  public async basicValidPlayer(cup: Cup, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean) {
+    let player;
+    if (cup.type == PlayersTypes.SOLO) {
+      player = isAdmin ? await this.validPlayerUser(playerJoin) : await this.usersService.findById(currentUserId);
+    } else {
+      player = await this.teamsService.findById(playerJoin.team);
+      if (!player) throw new BadRequestException('error team id');
+
+      if (!isAdmin && !this.teamsService.isCreator(player, currentUserId)) {
+        throw new ForbiddenException();
+      }
+    }
+
+    return player;
   }
 }
