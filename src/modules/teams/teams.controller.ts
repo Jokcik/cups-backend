@@ -2,7 +2,7 @@ import {Controller, Get, Post, Body, Param, Request, Put, Delete} from '@nestjs/
 import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamsService} from './teams.service';
 import {Team} from './interfaces/team.interface';
-import {Schema, Types} from 'mongoose';
+import {Schema} from 'mongoose';
 import {Roles, RolesTypes} from '../core/constants';
 import ObjectId = Schema.Types.ObjectId;
 
@@ -14,6 +14,11 @@ export class TeamsController {
   @Post()
   async create(@Body() createTeamDto: CreateTeamDto, @Request() req) {
     return this.teamsService.create(createTeamDto, req.user);
+  }
+
+  @Post('upload')
+  async upload(@Request() req) {
+    return req.files.logo.mv('./teams/image/filename.jpg');
   }
 
   @Post(':id/user')

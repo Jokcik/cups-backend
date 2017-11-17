@@ -19,6 +19,7 @@
     "@types/passport": "^0.3.4",
     "@types/passport-jwt": "^2.0.24",
     "body-parser": "^1.17.2",
+    "express-fileupload": "^0.3.0",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.4",
     "mongoose": "^4.11.13",
