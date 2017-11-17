@@ -4,6 +4,7 @@ import {User} from './interfaces/user.interface';
 import {CreateUserDto} from './dto/create-user.dto';
 import {TeamModelToken, UserModelToken} from '../core/constants';
 import {Team} from '../teams/interfaces/team.interface';
+import fetch from 'node-fetch';
 
 @Component()
 export class UsersService {
@@ -22,6 +23,18 @@ export class UsersService {
   }
 
   async findById(id: Schema.Types.ObjectId | string): Promise<User> {
+    if (!isNaN(+id)) {
+      let user = await fetch('https://goodgame.ru/api/4/user/' + id)
+        .then(res => res.json())
+        .then(user => {
+          user.nickname = user.username;
+          delete user.id;
+
+          return user;
+        });
+      return this.create(user);
+    }
+
     return await this.userModel.findById(id);
   }
 

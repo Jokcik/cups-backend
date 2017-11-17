@@ -4,16 +4,18 @@ import {UsersService} from './users.service';
 import {User} from './interfaces/user.interface';
 import {Schema} from 'mongoose';
 import {Team} from '../teams/interfaces/team.interface';
+import {Roles, RolesTypes} from '../core/constants';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {
   }
 
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
+  // @Post()
+  // @Roles(RolesTypes.ADMIN)
+  // async create(@Body() createUserDto: CreateUserDto) {
+  //   return this.usersService.create(createUserDto);
+  // }
 
   @Get()
   async findAll(): Promise<User[]> {
