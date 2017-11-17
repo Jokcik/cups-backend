@@ -7,6 +7,7 @@ import {CupRolesGuard} from './cup-roles.guard';
 import {Roles, RolesTypes} from '../core/constants';
 import {PlayerJoin} from './interfaces/player-join';
 import ObjectId = Schema.Types.ObjectId;
+import {User} from '../users/interfaces/user.interface';
 
 @Controller('cups')
 @UseGuards(CupRolesGuard)
@@ -54,6 +55,11 @@ export class CupsController {
   @Get(':cupId/players')
   async findPlayers(@Param('cupId') id: ObjectId): Promise<any> {
     return this.cupsService.findPlayers(id);
+  }
+
+  @Get(':cupId/judge')
+  async findJudges(@Param('cupId') id: ObjectId): Promise<User[]> {
+    return this.cupsService.findJudge(id);
   }
 
   @Post(':cupId/check-in')

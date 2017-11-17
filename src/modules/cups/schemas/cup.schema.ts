@@ -63,8 +63,9 @@ export const CupSchema = new mongoose.Schema({
     default: false
   },
   judges: {
-    type: [UserModelName],
-    default: []
+    type: [Schema.Types.ObjectId],
+    default: [],
+    ref: UserModelName
   },
   chat: Number,
   grid: Mixed,

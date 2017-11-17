@@ -8,13 +8,12 @@ import {User} from '../users/interfaces/user.interface';
 import {PlayersTypes} from './cups.constants';
 import {BadRequestException} from '../exception/bad-request.exception';
 import {TeamsService} from '../teams/teams.service';
-import {ForbiddenException} from '../exception/forbidden.exception';
 import {GGUtils} from '../core/gg-utils';
 import {PlayerJoin} from './interfaces/player-join';
 import {PlayersService} from './players.service';
 import {AUser} from '../authenticate/a-user';
-import ObjectId = Schema.Types.ObjectId;
 import {UsersService} from '../users/users.service';
+import ObjectId = Schema.Types.ObjectId;
 
 @Component()
 export class CupsService {
@@ -153,5 +152,9 @@ export class CupsService {
     }
 
     return await this.cupModel.findByIdAndUpdate(id, {$pull: {judges: judgeId}}, {upsert: true, new: true})
+  }
+
+  async findJudge(id: ObjectId): Promise<User[]> {
+    return await this.cupModel.findById(id).populate({path: 'judges', model: UserModelName}).then(cup => cup.judges)
   }
 }
