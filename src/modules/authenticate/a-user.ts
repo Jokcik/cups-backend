@@ -20,7 +20,7 @@ export class AUser extends User {
     Object.assign(this, user);
   }
 
-  public isJudjes() {
+  public isJudge() {
     return this._roles == RolesTypes.JUDGES || this.isCreator();
   }
 

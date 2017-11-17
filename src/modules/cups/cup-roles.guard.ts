@@ -48,7 +48,7 @@ export class CupRolesGuard implements CanActivate {
       let cup = await this.cupsService.findById(cupId);
       this.setRoles(user, cup);
 
-      if (_.includes(roles, RolesTypes.JUDGES) && user.isJudjes())
+      if (_.includes(roles, RolesTypes.JUDGES) && user.isJudge())
         return true;
 
       if (_.includes(roles, RolesTypes.CREATOR) && user.isCreator())

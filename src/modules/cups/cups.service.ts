@@ -14,6 +14,7 @@ import {PlayerJoin} from './interfaces/player-join';
 import {PlayersService} from './players.service';
 import {AUser} from '../authenticate/a-user';
 import ObjectId = Schema.Types.ObjectId;
+import {UsersService} from '../users/users.service';
 
 @Component()
 export class CupsService {
@@ -22,6 +23,7 @@ export class CupsService {
 
   constructor(@Inject(CupModelToken) private readonly cupModel: Model<Cup>,
               private readonly teamsService: TeamsService,
+              private readonly usersService: UsersService,
               private readonly ggUtils: GGUtils,
               private readonly playersService: PlayersService) {
   }
@@ -79,7 +81,7 @@ export class CupsService {
   }
 
   async addPlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
-    let isAdmin = currentUser.isJudjes();
+    let isAdmin = currentUser.isJudge();
     let cupPlayer = await this.playersService.playerValidate(id, playerJoin, currentUser.id, isAdmin);
 
     return await this.cupModel
@@ -88,7 +90,7 @@ export class CupsService {
   }
 
   async removePlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
-    let isAdmin = currentUser.isJudjes();
+    let isAdmin = currentUser.isJudge();
     let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 
@@ -110,7 +112,7 @@ export class CupsService {
 
 
   async checkInPlayer(id: ObjectId, user: AUser, playerJoin: PlayerJoin) {
-    let isAdmin = user.isJudjes();
+    let isAdmin = user.isJudge();
     let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 
@@ -123,5 +125,33 @@ export class CupsService {
     });
 
     return await this.cupModel.findByIdAndUpdate(id, cup, {new: true});
+  }
+
+  async addJudge(id: ObjectId, judgeId: ObjectId) {
+    let cup = await this.cupModel.findById(id);
+    if (!cup) throw new BadRequestException('invalid cup id');
+
+    let user = await this.usersService.findById(judgeId);
+    if (!user) throw new BadRequestException('invalid judge id');
+
+    if ((<any[]>cup.judges).some(judge => judge == judgeId)) {
+      throw new BadRequestException('Duplicate data')
+    }
+
+    return await this.cupModel.findByIdAndUpdate(id, {$push: {judges: judgeId}}, {upsert: true, new: true})
+  }
+
+  async removeJudge(id: ObjectId, judgeId: ObjectId) {
+    let cup = await this.cupModel.findById(id);
+    if (!cup) throw new BadRequestException('invalid cup id');
+
+    let user = await this.usersService.findById(judgeId);
+    if (!user) throw new BadRequestException('invalid judge id');
+
+    if (!(<any[]>cup.judges).some(judge => judge == judgeId)) {
+      throw new BadRequestException('judge not in cup')
+    }
+
+    return await this.cupModel.findByIdAndUpdate(id, {$pull: {judges: judgeId}}, {upsert: true, new: true})
   }
 }

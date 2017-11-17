@@ -60,4 +60,17 @@ export class CupsController {
   async checkIn(@Param('cupId') id: ObjectId, @Body() playerJoin: PlayerJoin, @Request() req): Promise<any> {
     return this.cupsService.checkInPlayer(id, req.user, playerJoin);
   }
+
+
+  @Post(':cupId/judge')
+  @Roles(RolesTypes.CREATOR)
+  async addJudge(@Param('cupId') id: ObjectId, @Body('judge') judge: ObjectId, @Request() req): Promise<any> {
+    return this.cupsService.addJudge(id, judge);
+  }
+
+  @Delete(':cupId/judge')
+  @Roles(RolesTypes.CREATOR)
+  async removeJudge(@Param('cupId') id: ObjectId, @Body('judge') judge: ObjectId, @Request() req): Promise<any> {
+    return this.cupsService.removeJudge(id, judge);
+  }
 }
