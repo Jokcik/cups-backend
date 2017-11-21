@@ -9,6 +9,6 @@ export class UploadsController {
 
   @Post()
   public async uploadFile(@Request() req) {
-    return await this.uploadsService.uploadFile(req);
+    return await this.uploadsService.uploadFile(req.get('host'), req.files, req.fields);
   }
 }

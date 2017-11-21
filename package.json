@@ -17,7 +17,6 @@
     "bluebird": "^3.5.1",
     "body-parser": "^1.17.2",
     "express-formidable": "^1.0.0",
-    "formidable": "^1.1.1",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.4",
     "mongoose": "^4.11.13",
