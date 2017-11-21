@@ -4,7 +4,7 @@ import {GamesModule} from './games/games.module';
 import {TeamsModule} from './teams/teams.module';
 import {UsersModule} from './users/users.module';
 import {AuthModule} from './authenticate/auth.module';
-import {GGUtils} from './core/gg-utils';
+import {UploadsModule} from './uploads/uploads.module';
 
 @Module({
   modules: [
@@ -12,7 +12,8 @@ import {GGUtils} from './core/gg-utils';
     GamesModule,
     TeamsModule,
     UsersModule,
-    AuthModule
+    AuthModule,
+    UploadsModule
   ],
 })
 export class ApplicationModule {

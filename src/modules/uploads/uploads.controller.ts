@@ -1,0 +1,14 @@
+import {Controller, Post, Request} from '@nestjs/common';
+import {UploadsService} from './uploads.service';
+
+
+@Controller('upload')
+export class UploadsController {
+  constructor(private uploadsService: UploadsService) {
+  }
+
+  @Post()
+  public async uploadFile(@Request() req) {
+    return await this.uploadsService.uploadFile(req);
+  }
+}

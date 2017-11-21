@@ -16,11 +16,6 @@ export class TeamsController {
     return this.teamsService.create(createTeamDto, req.user);
   }
 
-  @Post('upload')
-  async upload(@Request() req) {
-    return req.files.logo.mv('./teams/image/filename.jpg');
-  }
-
   @Post(':id/user')
   async addUser(@Param('id') id: ObjectId, @Body('user') user: string, @Request() req) {
     return this.teamsService.addUser(id, req.user, user);
