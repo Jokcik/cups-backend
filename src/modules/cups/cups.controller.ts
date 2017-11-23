@@ -15,24 +15,14 @@ export class CupsController {
   constructor(private readonly cupsService: CupsService) {
   }
 
-  @Get('goes')
-  async findCupsGoes(): Promise<Cup[]> {
-    return this.cupsService.findCupsGoes();
-  }
+  @Get('view')
+  async findCupsGoes(@Request() req): Promise<any> {
+    let goes = await this.cupsService.findCupsGoes();
+    let closed = await this.cupsService.findCupsClosed();
+    let opened = await this.cupsService.findCupsOpened();
+    let myCups = await this.cupsService.findMyCups(req.user);
 
-  @Get('closed')
-  async findCupsClosed(): Promise<Cup[]> {
-    return this.cupsService.findCupsClosed();
-  }
-
-  @Get('opened')
-  async findCupsOpened(): Promise<Cup[]> {
-    return this.cupsService.findCupsOpened();
-  }
-
-  @Get('my-cups')
-  async findCupsMyCups(@Request() req): Promise<Cup[]> {
-    return this.cupsService.findMyCups(req.user);
+    return {goes, closed, opened, myCups};
   }
 
   @Post()
