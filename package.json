@@ -16,6 +16,7 @@
     "@nestjs/websockets": "^4.0.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.17.2",
+    "express-cors": "0.0.3",
     "express-formidable": "^1.0.0",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.4",
