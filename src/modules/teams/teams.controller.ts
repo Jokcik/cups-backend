@@ -1,10 +1,10 @@
 import {Controller, Get, Post, Body, Param, Request, Put, Delete} from '@nestjs/common';
 import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamsService} from './teams.service';
-import {Team} from './interfaces/team.interface';
 import {Schema} from 'mongoose';
 import {Roles, RolesTypes} from '../core/constants';
 import ObjectId = Schema.Types.ObjectId;
+import {LongTeam, ShortTeam} from './interfaces/team.interface';
 
 @Controller('teams')
 export class TeamsController {
@@ -33,7 +33,7 @@ export class TeamsController {
 
   @Put(':id')
   @Roles(RolesTypes.CREATOR)
-  async update(@Param('id') id: Schema.Types.ObjectId, @Body() createCupDto: CreateTeamDto): Promise<Team> {
+  async update(@Param('id') id: Schema.Types.ObjectId, @Body() createCupDto: CreateTeamDto): Promise<ShortTeam> {
     return this.teamsService.update(id, createCupDto);
   }
 
@@ -44,12 +44,12 @@ export class TeamsController {
   }
 
   @Get()
-  async findAll(): Promise<Team[]> {
+  async findAll(): Promise<ShortTeam[]> {
     return this.teamsService.findAll();
   }
 
   @Get(':id')
-  async findById(@Param('id') id: Schema.Types.ObjectId): Promise<Team> {
+  async findById(@Param('id') id: Schema.Types.ObjectId): Promise<LongTeam> {
     return this.teamsService.findById(id);
   }
 }

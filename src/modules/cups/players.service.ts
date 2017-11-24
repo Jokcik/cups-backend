@@ -3,29 +3,27 @@ import {PlayerJoin} from './interfaces/player-join';
 import {PlayersTypes} from './cups.constants';
 import {CupPlayer} from './interfaces/cup-player';
 import {BadRequestException} from '../exception/bad-request.exception';
-import {Cup} from './interfaces/cup.interface';
 import {ForbiddenException} from '../exception/forbidden.exception';
-import {Model, Schema} from 'mongoose';
-import ObjectId = Schema.Types.ObjectId;
+import {Model} from 'mongoose';
 import {CupModelToken} from '../core/constants';
 import {TeamsService} from '../teams/teams.service';
 import {UsersService} from '../users/users.service';
-import {AUser} from '../authenticate/a-user';
-import {Team} from '../teams/interfaces/team.interface';
+import {ShortTeam} from '../teams/interfaces/team.interface';
+import {ShortCup} from './interfaces/cup.interface';
 
 @Component()
 export class PlayersService {
-  constructor(@Inject(CupModelToken) private readonly cupModel: Model<Cup>,
+  constructor(@Inject(CupModelToken) private readonly cupModel: Model<ShortCup>,
               private readonly teamsService: TeamsService,
               private readonly usersService: UsersService) {
   }
 
-  public isPlayer(cup: Cup, id: string): boolean {
+  public isPlayer(cup: ShortCup, id: string): boolean {
     return cup.players.some(value => value.id == id)
   }
 
 
-  public async validPlayerTeam(team: Team, playerJoin: PlayerJoin) {
+  public async validPlayerTeam(team: ShortTeam, playerJoin: PlayerJoin) {
     if (!team || !playerJoin.lineup) throw new BadRequestException('invalid team');
     if (!this.teamsService.isTeamsPlayer(team, playerJoin.lineup)) throw new BadRequestException('Incorrect data');
     if (!this.teamsService.isCaptainInTeam(team, playerJoin.lineup)) throw new BadRequestException('no captain in team players');
@@ -38,7 +36,7 @@ export class PlayersService {
     return user
   }
 
-  public getPlayerByCupType(cup: Cup, player: PlayerJoin, checkIn = false): CupPlayer {
+  public getPlayerByCupType(cup: ShortCup, player: PlayerJoin, checkIn = false): CupPlayer {
     if (!player) throw new BadRequestException('invalid data');
     return cup.type == PlayersTypes.SOLO ? {id: player.user, checkIn: checkIn} : {
       id: player.team,
@@ -47,8 +45,8 @@ export class PlayersService {
     };
   }
 
-  public async playerValidate(id: ObjectId, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean = false): Promise<CupPlayer> {
-    let cup = await this.cupModel.findById(id);
+  public async playerValidate(id: string, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean = false): Promise<CupPlayer> {
+    let cup = await this.cupModel.findOne({url: id});
     if (!cup) throw new BadRequestException('invalid cup');
 
     let player = await this.basicValidPlayer(cup, playerJoin, currentUserId, isAdmin);
@@ -66,7 +64,7 @@ export class PlayersService {
     return cupPlayer;
   }
 
-  public async basicValidPlayer(cup: Cup, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean) {
+  public async basicValidPlayer(cup: ShortCup, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean) {
     let player;
     if (cup.type == PlayersTypes.SOLO) {
       player = isAdmin ? await this.validPlayerUser(playerJoin) : await this.usersService.findById(currentUserId);

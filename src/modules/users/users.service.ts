@@ -3,14 +3,15 @@ import {Component, Inject} from '@nestjs/common';
 import {User} from './interfaces/user.interface';
 import {CreateUserDto} from './dto/create-user.dto';
 import {TeamModelToken, UserModelToken} from '../core/constants';
-import {Team} from '../teams/interfaces/team.interface';
 import fetch from 'node-fetch';
+import {ShortTeam} from '../teams/interfaces/team.interface';
 
 @Component()
 export class UsersService {
   constructor(
     @Inject(UserModelToken) private readonly userModel: Model<User>,
-    @Inject(TeamModelToken) private readonly teamModel: Model<Team>) {
+    //TODO: переделать на teamService!!!
+    @Inject(TeamModelToken) private readonly teamModel: Model<ShortTeam>) {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -38,7 +39,7 @@ export class UsersService {
     return await this.userModel.findById(id);
   }
 
-  async findTeams(id: Schema.Types.ObjectId): Promise<Team[]> {
+  async findTeams(id: Schema.Types.ObjectId): Promise<ShortTeam[]> {
     return await this.teamModel.find({'users.user': {$in: [id]}});
   }
 }

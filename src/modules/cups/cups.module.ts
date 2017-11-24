@@ -12,7 +12,7 @@ import {GGUtils} from '../core/gg-utils';
 import {PlayersService} from './players.service';
 
 const routes: any[] = [
-  { path: '/cups/my-cups', method: RequestMethod.GET },
+  // { path: '/cups/view', method: RequestMethod.GET },
 
   { path: '/cups/*', method: RequestMethod.POST },
   { path: '/cups', method: RequestMethod.POST },

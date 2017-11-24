@@ -1,10 +1,8 @@
-import {Controller, Get, Post, Body, Param} from '@nestjs/common';
-import {CreateUserDto} from './dto/create-user.dto';
+import {Controller, Get, Param} from '@nestjs/common';
 import {UsersService} from './users.service';
 import {User} from './interfaces/user.interface';
 import {Schema} from 'mongoose';
-import {Team} from '../teams/interfaces/team.interface';
-import {Roles, RolesTypes} from '../core/constants';
+import {ShortTeam} from '../teams/interfaces/team.interface';
 
 @Controller('users')
 export class UsersController {
@@ -28,7 +26,7 @@ export class UsersController {
   }
 
   @Get(':id/teams')
-  async findTeams(@Param('id') id: Schema.Types.ObjectId): Promise<Team[]> {
+  async findTeams(@Param('id') id: Schema.Types.ObjectId): Promise<ShortTeam[]> {
     return this.usersService.findTeams(id);
   }
 }

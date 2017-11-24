@@ -1,9 +1,8 @@
-///<reference path="../../../../node_modules/@types/mongoose/index.d.ts"/>
 import * as mongoose from 'mongoose';
-import {PrizePoolSchema} from './prize-pool.schema';
 import {Schema} from 'mongoose';
-import Mixed = Schema.Types.Mixed;
+import {PrizePoolSchema} from './prize-pool.schema';
 import {GameModelName, UserModelName} from '../../core/constants';
+import Mixed = Schema.Types.Mixed;
 
 const Players = new mongoose.Schema({
   id: Schema.Types.ObjectId,
@@ -21,8 +20,14 @@ export const CupSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
-
   },
+  team_size: Number,
+  title: {
+    type: String,
+    required: true,
+  },
+  finalbo: Number,
+  text_update: String,
   type: Number,
   url: {
     type: String,
@@ -56,7 +61,7 @@ export const CupSchema = new mongoose.Schema({
   },
   prize_pool: {
     type: PrizePoolSchema,
-    required: true
+    // required: true
   },
   closed: {
     type: Boolean,
@@ -72,8 +77,21 @@ export const CupSchema = new mongoose.Schema({
   players: {
     type: [Players]
   },
-  game: {
-    type: Schema.Types.ObjectId,
-    ref: GameModelName
+  game_id: String
+}, { toJSON: { virtuals: true } });
+
+CupSchema.index('url', {unique: true});
+
+CupSchema.virtual('game', {
+  ref: GameModelName,
+  localField: 'game_id',
+  foreignField: 'url',
+  justOne: true
+});
+
+CupSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    delete ret._id;
+    delete ret.__v;
   }
 });

@@ -1,9 +1,7 @@
-import {Model, Schema} from 'mongoose';
+import {Model} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
-import {Cup} from './interfaces/cup.interface';
 import {CreateCupDto} from './dto/create-cup.dto';
 import {CupModelToken, TeamModelName, UserModelName} from '../core/constants';
-import {Team} from '../teams/interfaces/team.interface';
 import {User} from '../users/interfaces/user.interface';
 import {PlayersTypes} from './cups.constants';
 import {BadRequestException} from '../exception/bad-request.exception';
@@ -13,47 +11,48 @@ import {PlayerJoin} from './interfaces/player-join';
 import {PlayersService} from './players.service';
 import {AUser} from '../authenticate/a-user';
 import {UsersService} from '../users/users.service';
-import ObjectId = Schema.Types.ObjectId;
+import {ShortTeam} from '../teams/interfaces/team.interface';
+import {LongCup, ShortCup} from './interfaces/cup.interface';
+import {CupPlayer} from './interfaces/cup-player';
 
 @Component()
 export class CupsService {
   private updateFields = ['description', 'type', 'url', 'start', 'logo', 'prize_pool',
     'chat', 'game', 'closed', 'invites', 'hidden', 'deleted'];
 
-  constructor(@Inject(CupModelToken) private readonly cupModel: Model<Cup>,
+  constructor(@Inject(CupModelToken) private readonly cupModel: Model<ShortCup>,
               private readonly teamsService: TeamsService,
               private readonly usersService: UsersService,
               private readonly ggUtils: GGUtils,
               private readonly playersService: PlayersService) {
   }
 
-  public isJudges(cup: Cup, id: string): boolean {
+  public isJudges(cup: LongCup, id: string): boolean {
     return cup.judges.some(value => value.id == id);
   }
 
-  public isCreator(cup: Cup, id: string): boolean {
+  public isCreator(cup: ShortCup | LongCup, id: string): boolean {
     return cup.ei_creator == id;
   }
 
-  async create(createCupDto: CreateCupDto, user: AUser): Promise<Cup> {
+  async create(createCupDto: CreateCupDto, user: AUser): Promise<ShortCup> {
     Object.assign(createCupDto, {ei_creator: user.id, ei_created: Date.now()});
     const createdCup = new this.cupModel(createCupDto);
     return await createdCup.save();
   }
 
-  //TODO: проверить
-  async update(id: ObjectId, createCupDto: CreateCupDto): Promise<Cup> {
-    let cup = await this.cupModel.findById(id);
+  async update(cupUrl: string, createCupDto: CreateCupDto): Promise<ShortCup> {
+    let cup = await this.cupModel.findOne({url: cupUrl});
     if (createCupDto.type != cup.type) {
       this.updateFields = this.updateFields.filter(value => value != 'type');
     }
     createCupDto = this.ggUtils.selectFieldByObject(createCupDto, this.updateFields);
 
-    return await this.cupModel.findByIdAndUpdate(id, createCupDto, {new: true});
+    return await this.cupModel.findByIdAndUpdate(cupUrl, createCupDto, {new: true});
   }
 
-  async findById(id: ObjectId): Promise<Cup> {
-    let cup = await this.cupModel.findById(id);
+  async findByUrl(cupUrl: string): Promise<LongCup> {
+    let cup = await this.cupModel.findOne({url: cupUrl}).populate('games');
     return await this.populatePlayers(cup);
   }
 
@@ -71,26 +70,26 @@ export class CupsService {
       });
   }
 
-  async findAll(): Promise<Cup[]> {
+  async findAll(): Promise<ShortCup[]> {
     return await this.cupModel.find()
   }
 
-  async remove(id: ObjectId): Promise<any> {
-    return this.cupModel.remove({_id: id})
+  async remove(cupUrl: string): Promise<any> {
+    return this.cupModel.remove({_id: cupUrl})
   }
 
-  async addPlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
+  async addPlayer(cupUrl: string, currentUser: AUser, playerJoin: PlayerJoin): Promise<CupPlayer[]> {
     let isAdmin = currentUser.isJudge();
-    let cupPlayer = await this.playersService.playerValidate(id, playerJoin, currentUser.id, isAdmin);
+    let cupPlayer = await this.playersService.playerValidate(cupUrl, playerJoin, currentUser.id, isAdmin);
 
     return await this.cupModel
-      .findByIdAndUpdate(id, {$push: {players: cupPlayer}}, {upsert: true, new: true})
+      .findByIdAndUpdate(cupUrl, {$push: {players: cupPlayer}}, {upsert: true, new: true})
       .then(cup => cup.players);
   }
 
-  async removePlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
+  async removePlayer(cupUrl: string, currentUser: AUser, playerJoin: PlayerJoin): Promise<CupPlayer[]> {
     let isAdmin = currentUser.isJudge();
-    let cup = await this.cupModel.findById(id);
+    let cup = await this.cupModel.findOne({url: cupUrl});
     if (!cup) throw new BadRequestException('invalid cup');
 
     await this.playersService.basicValidPlayer(cup, playerJoin, currentUser.id, isAdmin);
@@ -101,18 +100,18 @@ export class CupsService {
     let value = this.playersService.getPlayerByCupType(cup, playerJoin);
 
     return await this.cupModel
-      .findByIdAndUpdate(id, {$pull: {players: {id: value.id}}}, {upsert: true, new: true})
+      .findByIdAndUpdate(cupUrl, {$pull: {players: {id: value.id}}}, {upsert: true, new: true})
       .then(cup => cup.players);
   }
 
-  async findPlayers(id: ObjectId): Promise<(User | Team)[]> {
-    return await this.findById(id).then(cup => cup.players)
+  async findPlayers(cupUrl: string): Promise<(User | ShortTeam)[]> {
+    return await this.findByUrl(cupUrl).then(cup => cup.players)
   }
 
 
-  async checkInPlayer(id: ObjectId, user: AUser, playerJoin: PlayerJoin) {
+  async checkInPlayer(cupUrl: string, user: AUser, playerJoin: PlayerJoin) {
     let isAdmin = user.isJudge();
-    let cup = await this.cupModel.findById(id);
+    let cup = await this.cupModel.findOne({url: cupUrl});
     if (!cup) throw new BadRequestException('invalid cup');
 
     let player = await this.playersService.basicValidPlayer(cup, playerJoin, user.id, isAdmin);
@@ -123,11 +122,11 @@ export class CupsService {
       }
     });
 
-    return await this.cupModel.findByIdAndUpdate(id, cup, {new: true});
+    return await this.cupModel.findByIdAndUpdate(cupUrl, cup, {new: true});
   }
 
-  async addJudge(id: ObjectId, judgeId: ObjectId) {
-    let cup = await this.cupModel.findById(id);
+  async addJudge(cupUrl: string, judgeId: string) {
+    let cup = await this.cupModel.findOne({url: cupUrl});
     if (!cup) throw new BadRequestException('invalid cup id');
 
     let user = await this.usersService.findById(judgeId);
@@ -137,11 +136,11 @@ export class CupsService {
       throw new BadRequestException('Duplicate data')
     }
 
-    return await this.cupModel.findByIdAndUpdate(id, {$push: {judges: judgeId}}, {upsert: true, new: true})
+    return await this.cupModel.findByIdAndUpdate(cupUrl, {$push: {judges: judgeId}}, {upsert: true, new: true})
   }
 
-  async removeJudge(id: ObjectId, judgeId: ObjectId) {
-    let cup = await this.cupModel.findById(id);
+  async removeJudge(cupUrl: string, judgeId: string) {
+    let cup = await this.cupModel.findOne({url: cupUrl});
     if (!cup) throw new BadRequestException('invalid cup id');
 
     let user = await this.usersService.findById(judgeId);
@@ -151,11 +150,11 @@ export class CupsService {
       throw new BadRequestException('judge not in cup')
     }
 
-    return await this.cupModel.findByIdAndUpdate(id, {$pull: {judges: judgeId}}, {upsert: true, new: true})
+    return await this.cupModel.findByIdAndUpdate(cupUrl, {$pull: {judges: judgeId}}, {upsert: true, new: true})
   }
 
-  async findJudge(id: ObjectId): Promise<User[]> {
-    return await this.cupModel.findById(id).populate({path: 'judges', model: UserModelName}).then(cup => cup.judges)
+  async findJudge(cupUrl: string): Promise<User[]> {
+    return await this.cupModel.findOne({url: cupUrl}).populate({path: 'judges', model: UserModelName}).then(cup => <any[]>cup.judges)
   }
 
   async findCupsGoes() {

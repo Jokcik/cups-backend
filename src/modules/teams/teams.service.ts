@@ -1,6 +1,5 @@
 import {Model, Schema} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
-import {Team} from './interfaces/team.interface';
 import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamModelToken, UserModelName} from '../core/constants';
 import {User} from '../users/interfaces/user.interface';
@@ -10,37 +9,38 @@ import ObjectId = Schema.Types.ObjectId;
 import {AUser} from '../authenticate/a-user';
 import {BadRequestException} from '../exception/bad-request.exception';
 import {UsersService} from '../users/users.service';
+import {LongTeam, ShortTeam} from './interfaces/team.interface';
 
 @Component()
 export class TeamsService {
   private updateFields = ['title', 'url', 'status', 'players', 'logo', 'chat'];
 
-  constructor(@Inject(TeamModelToken) private readonly teamModel: Model<Team>,
+  constructor(@Inject(TeamModelToken) private readonly teamModel: Model<ShortTeam>,
               private readonly usersService: UsersService,
               private readonly ggUtils: GGUtils) {
   }
 
-  public isCreator(team: Team, userId: string): boolean {
+  public isCreator(team: ShortTeam | LongTeam, userId: string): boolean {
     return team.ei_creator == userId;
   }
 
-  public isTeamsPlayer(team: Team, lineup: string[]) {
+  public isTeamsPlayer(team: ShortTeam, lineup: string[]) {
     let inter = _.intersection(team.users.map(value => value._id.toString()), lineup);
     return inter.length == lineup.length;
   }
 
-  public isCaptainInTeam(team: Team, players: string[]) {
+  public isCaptainInTeam(team: ShortTeam, players: string[]) {
     return _.includes(players, team.ei_creator);
   }
 
-  async create(createTeamDto: CreateTeamDto, user: User): Promise<Team> {
+  async create(createTeamDto: CreateTeamDto, user: User): Promise<ShortTeam> {
     let users = createTeamDto.users.map(userId => {return {user: userId, joined: 0}});
     Object.assign(createTeamDto, {ei_creator: user.id, users});
     const createdTeam = new this.teamModel(createTeamDto);
     return await createdTeam.save();
   }
 
-  private combineUser(team): Team {
+  private combineUser(team): LongTeam {
     team.users.forEach((value: any, index) => {
       team.users[index] = Object.assign({}, value.toObject(), value.user.toObject());
       delete team.users[index].user;
@@ -48,17 +48,17 @@ export class TeamsService {
     return team;
   }
 
-  async findAll(): Promise<Team[]> {
+  async findAll(): Promise<ShortTeam[]> {
     return await this.teamModel.find()
   }
 
-  async findById(id: Schema.Types.ObjectId | string) {
+  async findById(id: Schema.Types.ObjectId | string): Promise<LongTeam> {
     return await this.teamModel.findById(id)
       .populate({path: 'users.user', model: UserModelName})
       .then(team =>  this.combineUser(team));
   }
 
-  async update(id: Schema.Types.ObjectId, createTeamDto: CreateTeamDto): Promise<Team> {
+  async update(id: Schema.Types.ObjectId, createTeamDto: CreateTeamDto): Promise<ShortTeam> {
     let team = this.ggUtils.selectFieldByObject(createTeamDto, this.updateFields);
     return await this.teamModel.findByIdAndUpdate(id, team, {new: true});
   }
