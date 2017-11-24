@@ -1,10 +1,8 @@
-import { Module } from '@nestjs/common';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { usersProviders } from './users.providers';
-import { DatabaseModule } from '../database/database.module';
-import {teamsProviders} from '../teams/teams.providers';
-import {TeamsService} from '../teams/teams.service';
+import {Module} from '@nestjs/common';
+import {UsersController} from './users.controller';
+import {UsersService} from './users.service';
+import {usersProviders} from './users.providers';
+import {DatabaseModule} from '../database/database.module';
 
 @Module({
   modules: [DatabaseModule],

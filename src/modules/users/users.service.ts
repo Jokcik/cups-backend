@@ -1,4 +1,4 @@
-import {Model, Schema} from 'mongoose';
+import {Model} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
 import {User} from './interfaces/user.interface';
 import {CreateUserDto} from './dto/create-user.dto';
@@ -15,17 +15,17 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const createdCat = new this.userModel(createUserDto);
-    return await createdCat.save();
+    const user = new this.userModel(createUserDto);
+    return await user.save();
   }
 
   async findAll(): Promise<User[]> {
     return await this.userModel.find();
   }
 
-  async findById(id: Schema.Types.ObjectId | string): Promise<User> {
-    if (!isNaN(+id)) {
-      let user = await fetch('https://goodgame.ru/api/4/user/' + id)
+  async findById(nickname: string): Promise<User> {
+    if (!isNaN(+nickname)) {
+      let user = await fetch('https://goodgame.ru/api/4/user/' + nickname)
         .then(res => res.json())
         .then(user => {
           user.nickname = user.username;
@@ -36,10 +36,10 @@ export class UsersService {
       return this.create(user);
     }
 
-    return await this.userModel.findById(id);
+    return await this.userModel.findById(nickname);
   }
 
-  async findTeams(id: Schema.Types.ObjectId): Promise<ShortTeam[]> {
-    return await this.teamModel.find({'users.user': {$in: [id]}});
+  async findTeams(nickname: string): Promise<ShortTeam[]> {
+    return await this.teamModel.find({'players.player': {$in: [nickname]}});
   }
 }

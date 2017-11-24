@@ -7,7 +7,7 @@ export const UserRelationSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  user: {
+  player: {
     type: Schema.Types.ObjectId,
     ref: UserModelName,
   }

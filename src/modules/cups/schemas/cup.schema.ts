@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import {Schema} from 'mongoose';
 import {PrizePoolSchema} from './prize-pool.schema';
-import {GameModelName, UserModelName} from '../../core/constants';
+import {GameModelName, TeamModelName, UserModelName} from '../../core/constants';
 import Mixed = Schema.Types.Mixed;
 
 const Players = new mongoose.Schema({
@@ -61,7 +61,7 @@ export const CupSchema = new mongoose.Schema({
   },
   prize_pool: {
     type: PrizePoolSchema,
-    // required: true
+    default: {}
   },
   closed: {
     type: Boolean,
@@ -89,8 +89,25 @@ CupSchema.virtual('game', {
   justOne: true
 });
 
+CupSchema.virtual('players_teams', {
+  ref: TeamModelName,
+  localField: 'players',
+  foreignField: 'url',
+  justOne: true
+});
+
+CupSchema.virtual('players_users', {
+  ref: UserModelName,
+  localField: 'players',
+  foreignField: 'nickname',
+  justOne: true
+});
+
 CupSchema.set('toJSON', {
   transform: (doc, ret) => {
+    ret.players = ret.players_teams || ret.players_users || ret.players;
+    delete ret.teams;
+    delete ret.players;
     delete ret._id;
     delete ret.__v;
   }

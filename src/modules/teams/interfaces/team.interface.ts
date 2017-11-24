@@ -6,15 +6,14 @@ interface Team extends Document {
   readonly url: string;
   readonly ei_creator: string;
   readonly status: number;
-  readonly players: number;
   readonly logo: string;
   readonly chat: number;
 }
 
 export interface ShortTeam extends Team {
-  readonly users: UserRelation[];
+  readonly players: UserRelation[];
 }
 
 export interface LongTeam extends Team {
-  readonly users: string[];
+  readonly players: string[];
 }

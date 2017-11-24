@@ -58,7 +58,7 @@ export class CupsService {
 
   async populatePlayers(cup) {
     return cup
-      .populate({path: 'players.id', model: cup.type == PlayersTypes.SOLO ? UserModelName : TeamModelName})
+      .populate({path: 'players.id', model: cup.type == PlayersTypes.SOLO ? UserModelName : TeamModelName, key: 'url'})
       .execPopulate()
       .then(cup => {
         cup.players.forEach((value: any, index) => {

@@ -33,3 +33,13 @@ export const TeamSchema = new mongoose.Schema({
   },
   users: [UserRelationSchema]
 });
+
+TeamSchema.index('url', {unique: true});
+
+
+TeamSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    delete ret._id;
+    delete ret.__v;
+  }
+});
