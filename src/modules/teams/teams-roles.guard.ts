@@ -1,4 +1,4 @@
-import {Guard} from '@nestjs/common';
+import {Guard, Param} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import {CanActivate} from '@nestjs/common/interfaces/can-activate.interface';
 import {ExecutionContext} from '@nestjs/common/interfaces/execution-context.interface';
@@ -6,7 +6,7 @@ import {RolesTypes} from '../core/constants';
 import * as _ from 'lodash';
 import {TeamsService} from './teams.service';
 import {AUser} from '../authenticate/a-user';
-import {LongTeam} from './interfaces/team.interface';
+import {Team} from './interfaces/team.interface';
 
 @Guard()
 export class TeamsRolesGuard implements CanActivate {
@@ -14,7 +14,7 @@ export class TeamsRolesGuard implements CanActivate {
               private readonly teamsService: TeamsService) {
   }
 
-  private setRoles(user: AUser, team: LongTeam = null) {
+  private setRoles(user: AUser, team: Team = null) {
     user.roles = RolesTypes.ALL;
 
     if (team && this.teamsService.isCreator(team, user.id)) {

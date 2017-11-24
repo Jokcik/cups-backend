@@ -1,7 +1,9 @@
 import {Controller, Get, Post, Body, Param, Request, Put, Delete} from '@nestjs/common';
 import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamsService} from './teams.service';
+import {Schema} from 'mongoose';
 import {Roles, RolesTypes} from '../core/constants';
+import ObjectId = Schema.Types.ObjectId;
 import {LongTeam, ShortTeam} from './interfaces/team.interface';
 
 @Controller('teams')
@@ -10,35 +12,35 @@ export class TeamsController {
   }
 
   @Post()
-  async create(@Body() team: ShortTeam, @Request() req) {
-    return this.teamsService.create(team, req.user);
+  async create(@Body() createTeamDto: CreateTeamDto, @Request() req) {
+    return this.teamsService.create(createTeamDto, req.user);
   }
 
-  @Post(':teamId/player')
-  async addPlayer(@Param('teamId') teamId: string, @Body('player') player: string, @Request() req) {
-    return this.teamsService.addPlayer(teamId, req.user, player);
+  @Post(':id/user')
+  async addUser(@Param('id') id: ObjectId, @Body('user') user: string, @Request() req) {
+    return this.teamsService.addUser(id, req.user, user);
   }
 
-  @Post(':teamId/joined')
-  async teamJoined(@Param('teamId') teamId: string, string, @Request() req) {
-    return this.teamsService.teamJoined(teamId, req.user);
+  @Post(':id/joined')
+  async teamJoined(@Param('id') id: ObjectId, string, @Request() req) {
+    return this.teamsService.teamJoined(id, req.user);
   }
 
-  @Delete(':teamId/player')
-  async removePlayer(@Param('teamId') teamId: string, @Body('player') player: string, @Request() req) {
-    return this.teamsService.removePlayer(teamId, req.user, player);
+  @Delete(':id/user')
+  async removeUser(@Param('id') id: ObjectId, @Body('user') user: string, @Request() req) {
+    return this.teamsService.removeUser(id, req.user, user);
   }
 
-  @Put(':teamId')
+  @Put(':id')
   @Roles(RolesTypes.CREATOR)
-  async update(@Param('teamId') teamId: string, @Body() createCupDto: CreateTeamDto): Promise<ShortTeam> {
-    return this.teamsService.update(teamId, createCupDto);
+  async update(@Param('id') id: Schema.Types.ObjectId, @Body() createCupDto: CreateTeamDto): Promise<Team> {
+    return this.teamsService.update(id, createCupDto);
   }
 
-  @Delete(':teamId')
+  @Delete(':id')
   @Roles(RolesTypes.CREATOR)
-  async remove(@Param('teamId') teamId: string): Promise<void> {
-    return this.teamsService.remove(teamId);
+  async remove(@Param('id') id: Schema.Types.ObjectId): Promise<void> {
+    return this.teamsService.remove(id);
   }
 
   @Get()
@@ -46,8 +48,8 @@ export class TeamsController {
     return this.teamsService.findAll();
   }
 
-  @Get(':teamId')
-  async findById(@Param('teamId') teamId: string): Promise<LongTeam> {
-    return this.teamsService.findById(teamId);
+  @Get(':id')
+  async findById(@Param('id') id: Schema.Types.ObjectId): Promise<LongTeam> {
+    return this.teamsService.findById(id);
   }
 }

@@ -6,7 +6,7 @@ import {CupsService} from './cups.service';
 import {RolesTypes} from '../core/constants';
 import * as _ from 'lodash';
 import {AUser} from '../authenticate/a-user';
-import {LongCup, ShortCup} from './interfaces/cup.interface';
+import {Cup} from './interfaces/cup.interface';
 
 @Guard()
 export class CupRolesGuard implements CanActivate {
@@ -14,7 +14,7 @@ export class CupRolesGuard implements CanActivate {
               private readonly cupsService: CupsService) {
   }
 
-  private setRoles(user: AUser, cup: LongCup = null) {
+  private setRoles(user: AUser, cup: Cup = null) {
     user.roles = RolesTypes.ALL;
 
     if (cup && this.cupsService.isJudges(cup, user.id)) {
@@ -43,9 +43,9 @@ export class CupRolesGuard implements CanActivate {
       roles = [];
     }
 
-    let cupUrl = req.params.cupUrl;
-    if (req.params && cupUrl) {
-      let cup = await this.cupsService.findByUrl(cupUrl);
+    let cupId = req.params.cupId;
+    if (req.params && cupId) {
+      let cup = await this.cupsService.findById(cupId);
       this.setRoles(user, cup);
 
       if (_.includes(roles, RolesTypes.JUDGES) && user.isJudge())

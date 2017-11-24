@@ -13,7 +13,7 @@ export class GamesController {
   }
 
   @Post('update-all')
-  // @Roles(RolesTypes.ADMIN)
+  @Roles(RolesTypes.ADMIN)
   async updateAllGame() {
     return this.gamesService.updateAllGames();
   }

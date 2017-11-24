@@ -1,6 +1,7 @@
 import {Controller, Get, Param} from '@nestjs/common';
 import {UsersService} from './users.service';
 import {User} from './interfaces/user.interface';
+import {Schema} from 'mongoose';
 import {ShortTeam} from '../teams/interfaces/team.interface';
 
 @Controller('users')
@@ -19,13 +20,13 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':nickname')
-  async findOne(@Param('nickname') nickname: string): Promise<User> {
-    return this.usersService.findById(nickname);
+  @Get(':id')
+  async findOne(@Param('id') id: Schema.Types.ObjectId): Promise<User> {
+    return this.usersService.findById(id);
   }
 
-  @Get(':nickname/teams')
-  async findTeams(@Param('nickname') nickname: string): Promise<ShortTeam[]> {
-    return this.usersService.findTeams(nickname);
+  @Get(':id/teams')
+  async findTeams(@Param('id') id: Schema.Types.ObjectId): Promise<ShortTeam[]> {
+    return this.usersService.findTeams(id);
   }
 }
