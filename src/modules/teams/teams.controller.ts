@@ -4,7 +4,7 @@ import {TeamsService} from './teams.service';
 import {Schema} from 'mongoose';
 import {Roles, RolesTypes} from '../core/constants';
 import ObjectId = Schema.Types.ObjectId;
-import {LongTeam, ShortTeam} from './interfaces/team.interface';
+import {Team} from "./interfaces/team.interface";
 
 @Controller('teams')
 export class TeamsController {
@@ -44,12 +44,12 @@ export class TeamsController {
   }
 
   @Get()
-  async findAll(): Promise<ShortTeam[]> {
+  async findAll(): Promise<Team[]> {
     return this.teamsService.findAll();
   }
 
   @Get(':id')
-  async findById(@Param('id') id: Schema.Types.ObjectId): Promise<LongTeam> {
+  async findById(@Param('id') id: Schema.Types.ObjectId): Promise<Team> {
     return this.teamsService.findById(id);
   }
 }

@@ -2,7 +2,7 @@ import {Controller, Get, Param} from '@nestjs/common';
 import {UsersService} from './users.service';
 import {User} from './interfaces/user.interface';
 import {Schema} from 'mongoose';
-import {ShortTeam} from '../teams/interfaces/team.interface';
+import {Team} from "../teams/interfaces/team.interface";
 
 @Controller('users')
 export class UsersController {
@@ -26,7 +26,7 @@ export class UsersController {
   }
 
   @Get(':id/teams')
-  async findTeams(@Param('id') id: Schema.Types.ObjectId): Promise<ShortTeam[]> {
+  async findTeams(@Param('id') id: Schema.Types.ObjectId): Promise<Team[]> {
     return this.usersService.findTeams(id);
   }
 }

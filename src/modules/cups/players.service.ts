@@ -10,8 +10,7 @@ import ObjectId = Schema.Types.ObjectId;
 import {CupModelToken} from '../core/constants';
 import {TeamsService} from '../teams/teams.service';
 import {UsersService} from '../users/users.service';
-import {AUser} from '../authenticate/a-user';
-import {Team} from '../teams/interfaces/team.interface';
+import {Team} from "../teams/interfaces/team.interface";
 
 @Component()
 export class PlayersService {

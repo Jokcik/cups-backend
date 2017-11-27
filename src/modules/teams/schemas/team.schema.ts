@@ -16,10 +16,6 @@ export const TeamSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  players: {
-    type: Number,
-    default: 0
-  },
   logo: {
     type: String
   },
@@ -31,7 +27,7 @@ export const TeamSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  users: [UserRelationSchema]
+  players: [UserRelationSchema]
 });
 
 TeamSchema.index('url', {unique: true});
@@ -39,7 +35,6 @@ TeamSchema.index('url', {unique: true});
 
 TeamSchema.set('toJSON', {
   transform: (doc, ret) => {
-    delete ret._id;
     delete ret.__v;
   }
 });

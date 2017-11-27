@@ -3,7 +3,6 @@ import {Component, Inject} from '@nestjs/common';
 import {Cup} from './interfaces/cup.interface';
 import {CreateCupDto} from './dto/create-cup.dto';
 import {CupModelToken, TeamModelName, UserModelName} from '../core/constants';
-import {Team} from '../teams/interfaces/team.interface';
 import {User} from '../users/interfaces/user.interface';
 import {PlayersTypes} from './cups.constants';
 import {BadRequestException} from '../exception/bad-request.exception';
@@ -14,6 +13,7 @@ import {PlayersService} from './players.service';
 import {AUser} from '../authenticate/a-user';
 import {UsersService} from '../users/users.service';
 import ObjectId = Schema.Types.ObjectId;
+import {Team} from "../teams/interfaces/team.interface";
 
 @Component()
 export class CupsService {

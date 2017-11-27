@@ -9,56 +9,56 @@ import ObjectId = Schema.Types.ObjectId;
 import {AUser} from '../authenticate/a-user';
 import {BadRequestException} from '../exception/bad-request.exception';
 import {UsersService} from '../users/users.service';
-import {LongTeam, ShortTeam} from './interfaces/team.interface';
+import {Team} from "./interfaces/team.interface";
 
 @Component()
 export class TeamsService {
   private updateFields = ['title', 'url', 'status', 'players', 'logo', 'chat'];
 
-  constructor(@Inject(TeamModelToken) private readonly teamModel: Model<ShortTeam>,
+  constructor(@Inject(TeamModelToken) private readonly teamModel: Model<Team>,
               private readonly usersService: UsersService,
               private readonly ggUtils: GGUtils) {
   }
 
-  public isCreator(team: ShortTeam | LongTeam, userId: string): boolean {
+  public isCreator(team: Team, userId: string): boolean {
     return team.ei_creator == userId;
   }
 
-  public isTeamsPlayer(team: ShortTeam, lineup: string[]) {
-    let inter = _.intersection(team.users.map(value => value._id.toString()), lineup);
+  public isTeamsPlayer(team: Team, lineup: string[]) {
+    let inter = _.intersection(team.players.map(value => value._id.toString()), lineup);
     return inter.length == lineup.length;
   }
 
-  public isCaptainInTeam(team: ShortTeam, players: string[]) {
+  public isCaptainInTeam(team: Team, players: string[]) {
     return _.includes(players, team.ei_creator);
   }
 
-  async create(createTeamDto: CreateTeamDto, user: User): Promise<ShortTeam> {
+  async create(createTeamDto: CreateTeamDto, user: User): Promise<Team> {
     let users = createTeamDto.users.map(userId => {return {user: userId, joined: 0}});
     Object.assign(createTeamDto, {ei_creator: user.id, users});
     const createdTeam = new this.teamModel(createTeamDto);
     return await createdTeam.save();
   }
 
-  private combineUser(team): LongTeam {
-    team.users.forEach((value: any, index) => {
-      team.users[index] = Object.assign({}, value.toObject(), value.user.toObject());
-      delete team.users[index].user;
+  private combineUser(team): Team {
+    team.players.forEach((value: any, index) => {
+      team.players[index] = Object.assign({}, value.toObject(), value.user.toObject());
+      delete team.players[index].user;
     });
     return team;
   }
 
-  async findAll(): Promise<ShortTeam[]> {
+  async findAll(): Promise<Team[]> {
     return await this.teamModel.find()
   }
 
-  async findById(id: Schema.Types.ObjectId | string): Promise<LongTeam> {
+  async findById(id: Schema.Types.ObjectId | string): Promise<Team> {
     return await this.teamModel.findById(id)
       .populate({path: 'users.user', model: UserModelName})
       .then(team =>  this.combineUser(team));
   }
 
-  async update(id: Schema.Types.ObjectId, createTeamDto: CreateTeamDto): Promise<ShortTeam> {
+  async update(id: Schema.Types.ObjectId, createTeamDto: CreateTeamDto): Promise<Team> {
     let team = this.ggUtils.selectFieldByObject(createTeamDto, this.updateFields);
     return await this.teamModel.findByIdAndUpdate(id, team, {new: true});
   }
@@ -80,7 +80,7 @@ export class TeamsService {
       teamUserId = user.id;
     }
 
-    if (team.users.some((value: any) => value.user == teamUserId)) {
+    if (team.players.some((value: any) => value.user == teamUserId)) {
       throw new BadRequestException('duplicate data');
     }
 
@@ -101,7 +101,7 @@ export class TeamsService {
       teamUserId = user.id;
     }
 
-    if (!team.users.some((value: any) => value.user == teamUserId)) {
+    if (!team.players.some((value: any) => value.user == teamUserId)) {
       throw new BadRequestException('in team not user');
     }
 
@@ -112,12 +112,12 @@ export class TeamsService {
     let team = await this.teamModel.findById(id);
     if (!team) throw new BadRequestException('error team id');
 
-    if (!team.users.some((value: any) => value.user == currentUser.id)) {
+    if (!team.players.some((value: any) => value.user == currentUser.id)) {
       throw new BadRequestException('in team not current user');
     }
 
-    team.users.forEach(user => {
-      if (user.user == currentUser.id) {
+    team.players.forEach(user => {
+      if (user.player == currentUser.id) {
         Object.assign(user, {joined: 1});
       }
     });
