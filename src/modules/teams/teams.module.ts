@@ -25,7 +25,7 @@ const routes: any[] = [
   components: [
     TeamsService,
     ...teamsProviders,
-    GGUtils
+    GGUtils,
   ],
   exports: [
     TeamsService,

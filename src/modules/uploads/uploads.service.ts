@@ -12,7 +12,7 @@ export class UploadsService {
     if (!_.includes(TYPES, fields.type)) throw new BadRequestException('invalid type');
 
     let url = '/images/' + fields.type + '/' + uniqid() + path.extname(files.logo.name);
-    fs.renameSync(files.logo.path, './src' + url);
+    fs.renameSync(files.logo.path, './src/public' + url);
     return {url: host + url}
   }
 }

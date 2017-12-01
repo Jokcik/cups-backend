@@ -12,6 +12,7 @@ export const TeamSchema = new mongoose.Schema({
     unique: true
   },
   ei_creator: String,
+  captain: String,
   status: {
     type: Number,
     default: 0
@@ -23,6 +24,7 @@ export const TeamSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  // Что за херня????
   type: {
     type: Boolean,
     default: true

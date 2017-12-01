@@ -11,7 +11,7 @@ import {PlayerJoin} from './interfaces/player-join';
 import {PlayersService} from './players.service';
 import {AUser} from '../authenticate/a-user';
 import {UsersService} from '../users/users.service';
-import {Team} from "../teams/interfaces/team.interface";
+import {TeamShort} from "../teams/interfaces/team.interface";
 import ObjectId = Schema.Types.ObjectId;
 import {LongCup, ShortCup} from "./interfaces/cup.interface";
 import {CupPlayer} from "./interfaces/cup-player";
@@ -111,7 +111,7 @@ export class CupsService {
       .then(cup => cup.players);
   }
 
-  async findPlayers(id: ObjectId): Promise<(User | Team)[]> {
+  async findPlayers(id: ObjectId): Promise<(User | TeamShort)[]> {
     return await this.findById(id).then(cup => cup.players)
   }
 

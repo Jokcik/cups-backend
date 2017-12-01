@@ -1,6 +1,13 @@
 import { Document } from 'mongoose';
+import {User} from "../../users/interfaces/user.interface";
 
-export interface UserRelation extends Document {
+interface UserRelation {
   readonly joined: number;
+}
+
+export interface UserRelationLong extends UserRelation, User{
+}
+
+export interface UserRelationShort extends UserRelation, Document {
   readonly player: string;
 }

@@ -18,7 +18,7 @@ export class CupRolesGuard implements CanActivate {
     user.roles = RolesTypes.ALL;
 
     if (cup && this.cupsService.isJudges(cup, user.id)) {
-      user.roles = RolesTypes.CREATOR;
+      user.roles = RolesTypes.JUDGES;
     }
 
     if (cup && this.cupsService.isCreator(cup, user.id)) {

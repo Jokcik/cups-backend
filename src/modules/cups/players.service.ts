@@ -8,7 +8,7 @@ import {Model, Schema} from 'mongoose';
 import {CupModelToken} from '../core/constants';
 import {TeamsService} from '../teams/teams.service';
 import {UsersService} from '../users/users.service';
-import {Team} from "../teams/interfaces/team.interface";
+import {TeamShort} from "../teams/interfaces/team.interface";
 import ObjectId = Schema.Types.ObjectId;
 import {ShortCup} from "./interfaces/cup.interface";
 
@@ -24,7 +24,7 @@ export class PlayersService {
   }
 
 
-  public async validPlayerTeam(team: Team, playerJoin: PlayerJoin) {
+  public async validPlayerTeam(team: TeamShort, playerJoin: PlayerJoin) {
     if (!team || !playerJoin.lineup) throw new BadRequestException('invalid team');
     if (!this.teamsService.isTeamsPlayer(team, playerJoin.lineup)) throw new BadRequestException('Incorrect data');
     if (!this.teamsService.isCaptainInTeam(team, playerJoin.lineup)) throw new BadRequestException('no captain in team players');

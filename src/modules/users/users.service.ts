@@ -3,7 +3,7 @@ import {Component, Inject} from '@nestjs/common';
 import {User} from './interfaces/user.interface';
 import {CreateUserDto} from './dto/create-user.dto';
 import {TeamModelToken, UserModelToken} from '../core/constants';
-import {Team} from "../teams/interfaces/team.interface";
+import {TeamShort} from "../teams/interfaces/team.interface";
 import fetch from 'node-fetch';
 import ObjectId = Schema.Types.ObjectId;
 
@@ -11,7 +11,7 @@ import ObjectId = Schema.Types.ObjectId;
 export class UsersService {
   constructor(@Inject(UserModelToken) private readonly userModel: Model<User>,
               //TODO: переделать на teamService!!!
-              @Inject(TeamModelToken) private readonly teamModel: Model<Team>) {
+              @Inject(TeamModelToken) private readonly teamModel: Model<TeamShort>) {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -29,6 +29,7 @@ export class UsersService {
         .then(res => res.json())
         .then(user => {
           user.nickname = user.username;
+          user.logo = "https://goodgame.ru" + user.avatar;
           delete user.id;
 
           return user;
@@ -39,7 +40,12 @@ export class UsersService {
     return await this.userModel.findById(id);
   }
 
-  async findTeams(id: ObjectId): Promise<Team[]> {
-    return await this.teamModel.find({'users.user': {$in: [id]}});
+  async findTeams(id: ObjectId): Promise<TeamShort[]> {
+    return await this.teamModel.find({'players.player': {$in: [id]}});
+  }
+
+  async findPlayers(search: string, limit: number) {
+    let users = await this.userModel.find({nickname: {$regex: search, $options: "i"}}).limit(limit);
+    return users.map(user => {return {title: user.nickname, object: user}})
   }
 }

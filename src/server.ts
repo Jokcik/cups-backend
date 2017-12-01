@@ -11,7 +11,7 @@ async function bootstrap() {
   app.use(bodyParser.json());
   app.setGlobalPrefix('api');
   app.use(express.static(path.join(__dirname, 'public')));
-  app.use(cors({allowedOrigins: ['localhost:3000'], headers: ['enctype']}));
+  app.use(cors({allowedOrigins: ['localhost:3000'], headers: ['Content-Type', 'enctype', 'Authorization']}));
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(3001);
 
