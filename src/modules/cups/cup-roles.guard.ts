@@ -1,12 +1,12 @@
-import {Guard, Param} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import {Guard} from '@nestjs/common';
+import {Reflector} from '@nestjs/core';
 import {CanActivate} from '@nestjs/common/interfaces/can-activate.interface';
 import {ExecutionContext} from '@nestjs/common/interfaces/execution-context.interface';
 import {CupsService} from './cups.service';
 import {RolesTypes} from '../core/constants';
 import * as _ from 'lodash';
 import {AUser} from '../authenticate/a-user';
-import {Cup} from './interfaces/cup.interface';
+import {LongCup} from "./interfaces/cup.interface";
 
 @Guard()
 export class CupRolesGuard implements CanActivate {
@@ -14,7 +14,7 @@ export class CupRolesGuard implements CanActivate {
               private readonly cupsService: CupsService) {
   }
 
-  private setRoles(user: AUser, cup: Cup = null) {
+  private setRoles(user: AUser, cup: LongCup = null) {
     user.roles = RolesTypes.ALL;
 
     if (cup && this.cupsService.isJudges(cup, user.id)) {

@@ -1,13 +1,13 @@
 import {Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards,} from '@nestjs/common';
 import {CreateCupDto} from './dto/create-cup.dto';
 import {CupsService} from './cups.service';
-import {Cup} from './interfaces/cup.interface';
 import {Schema} from 'mongoose';
 import {CupRolesGuard} from './cup-roles.guard';
 import {Roles, RolesTypes} from '../core/constants';
 import {PlayerJoin} from './interfaces/player-join';
 import ObjectId = Schema.Types.ObjectId;
 import {User} from '../users/interfaces/user.interface';
+import {LongCup, ShortCup} from "./interfaces/cup.interface";
 
 @Controller('cups')
 @UseGuards(CupRolesGuard)
@@ -32,7 +32,7 @@ export class CupsController {
 
   @Put(':cupId')
   @Roles(RolesTypes.JUDGES)
-  async update(@Param('cupId') id: ObjectId, @Body() createCupDto: CreateCupDto): Promise<Cup> {
+  async update(@Param('cupId') id: ObjectId, @Body() createCupDto: CreateCupDto): Promise<ShortCup> {
     return this.cupsService.update(id, createCupDto);
   }
 
@@ -43,12 +43,12 @@ export class CupsController {
   }
 
   @Get()
-  async findAll(@Request() req): Promise<Cup[]> {
+  async findAll(@Request() req): Promise<ShortCup[]> {
     return this.cupsService.findAll();
   }
 
   @Get(':cupId')
-  async findById(@Param('cupId') id: ObjectId): Promise<Cup> {
+  async findById(@Param('cupId') id: ObjectId): Promise<LongCup> {
     return this.cupsService.findById(id);
   }
 

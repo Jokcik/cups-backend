@@ -1,10 +1,11 @@
 import { Document } from 'mongoose';
 import {PrizePool} from './prize-pool.interface';
-import {Game} from '../../games/interfaces/game.interface';
 import {User} from '../../users/interfaces/user.interface';
 import {Team} from '../../teams/interfaces/team.interface';
+import {Game} from "../../games/interfaces/game.interface";
+import {CupPlayer} from "./cup-player";
 
-export interface Cup extends Document {
+interface Cup extends Document {
   readonly description: string;
   readonly type: number;
   readonly url: string;
@@ -19,7 +20,16 @@ export interface Cup extends Document {
   readonly closed: boolean;
   readonly chat: number;
   readonly grid: any;
-  readonly players: (User | Team)[];
-  readonly judges: User[];
-  readonly game: number;
+}
+
+export interface ShortCup extends Cup {
+    readonly judges: User[];
+    readonly players: CupPlayer[];
+    readonly game: string;
+}
+
+export interface LongCup extends Cup {
+    readonly judges: User[];
+    readonly players: (User | Team)[];
+    readonly game: Game;
 }

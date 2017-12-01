@@ -1,6 +1,5 @@
 import {Model, Schema} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
-import {Cup} from './interfaces/cup.interface';
 import {CreateCupDto} from './dto/create-cup.dto';
 import {CupModelToken, TeamModelName, UserModelName} from '../core/constants';
 import {User} from '../users/interfaces/user.interface';
@@ -12,37 +11,39 @@ import {PlayerJoin} from './interfaces/player-join';
 import {PlayersService} from './players.service';
 import {AUser} from '../authenticate/a-user';
 import {UsersService} from '../users/users.service';
-import ObjectId = Schema.Types.ObjectId;
 import {Team} from "../teams/interfaces/team.interface";
+import ObjectId = Schema.Types.ObjectId;
+import {LongCup, ShortCup} from "./interfaces/cup.interface";
+import {CupPlayer} from "./interfaces/cup-player";
 
 @Component()
 export class CupsService {
   private updateFields = ['description', 'type', 'url', 'start', 'logo', 'prize_pool',
     'chat', 'game', 'closed', 'invites', 'hidden', 'deleted'];
 
-  constructor(@Inject(CupModelToken) private readonly cupModel: Model<Cup>,
+  constructor(@Inject(CupModelToken) private readonly cupModel: Model<ShortCup>,
               private readonly teamsService: TeamsService,
               private readonly usersService: UsersService,
               private readonly ggUtils: GGUtils,
               private readonly playersService: PlayersService) {
   }
 
-  public isJudges(cup: Cup, id: string): boolean {
+  public isJudges(cup: ShortCup | LongCup, id: string): boolean {
     return cup.judges.some(value => value.id == id);
   }
 
-  public isCreator(cup: Cup, id: string): boolean {
+  public isCreator(cup: ShortCup | LongCup, id: string): boolean {
     return cup.ei_creator == id;
   }
 
-  async create(createCupDto: CreateCupDto, user: AUser): Promise<Cup> {
+  async create(createCupDto: CreateCupDto, user: AUser): Promise<ShortCup> {
     Object.assign(createCupDto, {ei_creator: user.id, ei_created: Date.now()});
     const createdCup = new this.cupModel(createCupDto);
     return await createdCup.save();
   }
 
   //TODO: проверить
-  async update(id: ObjectId, createCupDto: CreateCupDto): Promise<Cup> {
+  async update(id: ObjectId, createCupDto: CreateCupDto): Promise<ShortCup> {
     let cup = await this.cupModel.findById(id);
     if (createCupDto.type != cup.type) {
       this.updateFields = this.updateFields.filter(value => value != 'type');
@@ -52,7 +53,7 @@ export class CupsService {
     return await this.cupModel.findByIdAndUpdate(id, createCupDto, {new: true});
   }
 
-  async findById(id: ObjectId): Promise<Cup> {
+  async findById(id: ObjectId): Promise<LongCup> {
     let cup = await this.cupModel.findById(id);
     return await this.populatePlayers(cup);
   }
@@ -71,7 +72,7 @@ export class CupsService {
       });
   }
 
-  async findAll(): Promise<Cup[]> {
+  async findAll(): Promise<ShortCup[]> {
     return await this.cupModel.find()
   }
 
@@ -79,7 +80,7 @@ export class CupsService {
     return this.cupModel.remove({_id: id})
   }
 
-  async addPlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
+  async addPlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<CupPlayer[]> {
     let isAdmin = currentUser.isJudge();
     let cupPlayer = await this.playersService.playerValidate(id, playerJoin, currentUser.id, isAdmin);
 
@@ -88,7 +89,7 @@ export class CupsService {
       .then(cup => cup.players);
   }
 
-  async removePlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<(User | Team)[]> {
+  async removePlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<CupPlayer[]> {
     let isAdmin = currentUser.isJudge();
     let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
