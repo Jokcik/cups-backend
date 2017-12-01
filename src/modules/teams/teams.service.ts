@@ -1,15 +1,15 @@
 import {Model, Schema} from 'mongoose';
-import {Component, Inject, UseGuards} from '@nestjs/common';
+import {Component, Inject} from '@nestjs/common';
 import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamModelToken, UserModelName} from '../core/constants';
 import {User} from '../users/interfaces/user.interface';
-import * as _ from 'lodash'
 import {GGUtils} from '../core/gg-utils';
-import ObjectId = Schema.Types.ObjectId;
 import {AUser} from '../authenticate/a-user';
 import {BadRequestException} from '../exception/bad-request.exception';
 import {UsersService} from '../users/users.service';
 import {TeamShort} from "./interfaces/team.interface";
+import * as _ from 'lodash'
+import ObjectId = Schema.Types.ObjectId;
 
 @Component()
 export class TeamsService {
@@ -66,8 +66,14 @@ export class TeamsService {
   }
 
   async update(id: Schema.Types.ObjectId, createTeamDto: CreateTeamDto): Promise<TeamShort> {
+    let addPlayers1 = (<any>createTeamDto).addPlayers.map(id => {return {player: id, joined: 0}});
+    let removePlayers1 = (<any>createTeamDto).removePlayers;
+
     let team = this.ggUtils.selectFieldByObject(createTeamDto, this.updateFields);
-    return await this.teamModel.findByIdAndUpdate(id, team, {new: true});
+
+    return await this.teamModel.findByIdAndUpdate(id, team)
+      .findOneAndUpdate(id, {$pull: {players: {player: {$in: removePlayers1}}}}, )
+      .then(team => team.update({$push: {players: {$each: addPlayers1}}}, {new: true}));
   }
 
   async remove(id: Schema.Types.ObjectId): Promise<any> {
@@ -114,8 +120,10 @@ export class TeamsService {
       throw new BadRequestException('in team not user');
     }
 
+    console.log('removePlayer', teamUserId);
     return this.teamModel.findByIdAndUpdate(id, {$pull: {players: {player: teamUserId}}}, {new: true})
-      .then(team => team.players);
+      .populate({path: 'players.player', model: UserModelName})
+      .then(team =>  this.combineUser(team).players);
   }
 
   async teamJoined(id: ObjectId, currentUser: AUser) {
