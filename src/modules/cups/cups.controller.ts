@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards,} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards,} from '@nestjs/common';
 import {CreateCupDto} from './dto/create-cup.dto';
 import {CupsService} from './cups.service';
 import {Schema} from 'mongoose';
@@ -43,8 +43,8 @@ export class CupsController {
   }
 
   @Get()
-  async findAll(@Request() req): Promise<ShortCup[]> {
-    return this.cupsService.findAll();
+  async findAll(@Query('url') url: string, @Query('long') long: boolean): Promise<ShortCup[]> {
+    return this.cupsService.findAll(url, long);
   }
 
   @Get(':cupId')

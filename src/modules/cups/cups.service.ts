@@ -72,8 +72,13 @@ export class CupsService {
       });
   }
 
-  async findAll(): Promise<ShortCup[]> {
-    return await this.cupModel.find()
+  async findAll(url: string, long: boolean): Promise<ShortCup[]> {
+    if (url && long) {
+      let cup = await this.cupModel.findOne({url}).populate('game');
+      return [await this.populatePlayers(cup)];
+    }
+
+    return await this.cupModel.find(url ? {url} : {})
   }
 
   async remove(id: ObjectId): Promise<any> {
