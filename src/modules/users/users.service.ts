@@ -1,4 +1,4 @@
-import {Model, Schema} from 'mongoose';
+import {Model, Schema, Types} from 'mongoose';
 import {Component, Inject} from '@nestjs/common';
 import {User} from './interfaces/user.interface';
 import {CreateUserDto} from './dto/create-user.dto';
@@ -21,6 +21,10 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return await this.userModel.find();
+  }
+
+  async findByManyId(ids: string[]) {
+    return this.userModel.find({_id: {$in: ids}});
   }
 
   async findById(id: ObjectId | string): Promise<User> {

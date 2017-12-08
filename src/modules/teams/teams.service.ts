@@ -13,7 +13,7 @@ import ObjectId = Schema.Types.ObjectId;
 
 @Component()
 export class TeamsService {
-  private updateFields = ['title', 'url', 'status', 'players', 'logo', 'chat'];
+  private updateFields = ['title', 'url', 'status', 'logo', 'chat'];
 
   constructor(@Inject(TeamModelToken) private readonly teamModel: Model<TeamShort>,
               private readonly usersService: UsersService,
@@ -34,8 +34,11 @@ export class TeamsService {
   }
 
   async create(createTeamDto: CreateTeamDto, user: User): Promise<TeamShort> {
-    let users = createTeamDto.users.map(userId => {return {user: userId, joined: 0}});
-    Object.assign(createTeamDto, {ei_creator: user.id, captain: user.nickname, users});
+    let players = createTeamDto.players.map(userId => {return {player: userId, joined: 0}});
+    Object.assign(createTeamDto, {ei_creator: user.id, captain: user.nickname, players,
+      url: this.ggUtils.translit(createTeamDto.title)});
+
+
     const createdTeam = new this.teamModel(createTeamDto);
     return await createdTeam.save();
   }
@@ -65,65 +68,60 @@ export class TeamsService {
       .then(team =>  this.combineUser(team));
   }
 
-  async update(id: Schema.Types.ObjectId, createTeamDto: CreateTeamDto): Promise<TeamShort> {
-    let addPlayers1 = (<any>createTeamDto).addPlayers.map(id => {return {player: id, joined: 0}});
-    let removePlayers1 = (<any>createTeamDto).removePlayers;
+  async update(id: ObjectId, createTeamDto: CreateTeamDto, user: AUser): Promise<TeamShort> {
+    await this.validPlayerTeam(id, createTeamDto.addPlayers, createTeamDto.removePlayers);
+
+    let addPlayers1 = createTeamDto.addPlayers.map(id => {return {player: id, joined: user.isAdmin() ? 1 : 0}});
+    let removePlayers1 = createTeamDto.removePlayers;
 
     let team = this.ggUtils.selectFieldByObject(createTeamDto, this.updateFields);
+    if (team.title) {
+      Object.assign(team, {url: this.ggUtils.translit(team.title)})
+    }
 
     return await this.teamModel.findByIdAndUpdate(id, team)
       .findOneAndUpdate(id, {$pull: {players: {player: {$in: removePlayers1}}}}, )
       .then(team => team.update({$push: {players: {$each: addPlayers1}}}, {new: true}));
   }
 
+  async validPlayerTeam(id: ObjectId, addPlayers: string[], removePlayers: string[]) {
+    addPlayers = addPlayers ? addPlayers : [];
+    removePlayers = removePlayers ? removePlayers : [];
+
+    let users = await this.usersService.findByManyId(_.concat(addPlayers, removePlayers));
+    if (users.some(user => !user)) {
+      throw new BadRequestException('error team player');
+    }
+
+    if(id) {
+      let team = await this.teamModel.findById(id);
+      if (!team) throw new BadRequestException('error team id');
+
+      let idsCurrentPlayers = team.players.map(player => player.player.toString());
+
+      // Если хоть один из игроков уже был в тиме, то ошибка
+      if (_.intersection(idsCurrentPlayers, addPlayers).length != 0) {
+        throw new BadRequestException('duplicate data')
+      }
+
+      // Если хоть один из игроков не был в в тиме, то ошибка
+      if (_.intersection(idsCurrentPlayers, removePlayers).length != removePlayers.length) {
+        throw new BadRequestException('player not in team')
+      }
+    }
+  }
+
   async remove(id: Schema.Types.ObjectId): Promise<any> {
-    return this.teamModel.remove({_id: id})
+    let team = await this.teamModel.findByIdAndUpdate(id, {status: -1}, {new: true})
+      .populate({path: 'players.player', model: UserModelName});
+    return this.combineUser(team);
   }
 
-  async addPlayer(id: ObjectId, currentUser: AUser, playerId: string) {
-    let team = await this.teamModel.findById(id);
-    if (!team) throw new BadRequestException('error team id');
 
-    let isAdmin = currentUser.isCreator();
-    let teamUserId = currentUser.id;
-    if (isAdmin && playerId) {
-      if (!playerId) throw new BadRequestException('error body user');
-      let user = await this.usersService.findById(playerId);
-      if (!user) throw new BadRequestException('error body user');
-      teamUserId = user.id;
-    }
-
-    if (team.players.some((value: any) => value.player == teamUserId)) {
-      throw new BadRequestException('duplicate data');
-    }
-
-    let obj = {player: teamUserId, joined: 0};
-
-    return this.teamModel.findByIdAndUpdate(id, {$push: {players: obj}}, {new: true})
-      .populate({path: 'players.player', model: UserModelName})
-      .then(team =>  this.combineUser(team).players);
-  }
-
-  async removePlayer(id: ObjectId, currentUser: AUser, playerId: string) {
-    let team = await this.teamModel.findById(id);
-    if (!team) throw new BadRequestException('error team id');
-
-    let isAdmin = currentUser.isCreator();
-    let teamUserId = currentUser.id;
-    if (isAdmin && playerId) {
-      let user = await this.usersService.findById(playerId);
-      if (!user) throw new BadRequestException('error user id');
-      teamUserId = user.id;
-    }
-
-    if (!team.players.some((value: any) => value.player == teamUserId)) {
-      throw new BadRequestException('in team not user');
-    }
-
-    console.log('removePlayer', teamUserId);
-    return this.teamModel.findByIdAndUpdate(id, {$pull: {players: {player: teamUserId}}}, {new: true})
-      .populate({path: 'players.player', model: UserModelName})
-      .then(team =>  this.combineUser(team).players);
+  async restore(id: Schema.Types.ObjectId): Promise<any> {
+    let team = await this.teamModel.findByIdAndUpdate(id, {status: 0}, {new: true})
+      .populate({path: 'players.player', model: UserModelName});
+    return this.combineUser(team);
   }
 
   async teamJoined(id: ObjectId, currentUser: AUser) {

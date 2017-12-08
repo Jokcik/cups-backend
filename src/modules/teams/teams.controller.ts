@@ -3,9 +3,9 @@ import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamsService} from './teams.service';
 import {Schema} from 'mongoose';
 import {Roles, RolesTypes} from '../core/constants';
-import ObjectId = Schema.Types.ObjectId;
 import {TeamShort} from "./interfaces/team.interface";
 import {TeamsRolesGuard} from "./teams-roles.guard";
+import ObjectId = Schema.Types.ObjectId;
 
 @Controller('teams')
 @UseGuards(TeamsRolesGuard)
@@ -18,31 +18,27 @@ export class TeamsController {
     return this.teamsService.create(createTeamDto, req.user);
   }
 
-  @Post(':id/player')
-  async addPlayer(@Param('id') id: ObjectId, @Body('player') player: string, @Request() req) {
-    return this.teamsService.addPlayer(id, req.user, player);
-  }
-
   @Post(':id/joined')
   async teamJoined(@Param('id') id: ObjectId, string, @Request() req) {
     return this.teamsService.teamJoined(id, req.user);
   }
 
-  @Delete(':id/player')
-  async removePlayer(@Param('id') id: ObjectId, @Body('player') player: string, @Request() req) {
-    return this.teamsService.removePlayer(id, req.user, player);
-  }
-
   @Put(':id')
   @Roles(RolesTypes.CREATOR)
-  async update(@Param('id') id: Schema.Types.ObjectId, @Body() createCupDto: CreateTeamDto): Promise<TeamShort> {
-    return this.teamsService.update(id, createCupDto);
+  async update(@Param('id') id: ObjectId, @Body() createCupDto: CreateTeamDto, @Request() req): Promise<TeamShort> {
+    return this.teamsService.update(id, createCupDto, req.user);
   }
 
   @Delete(':id')
   @Roles(RolesTypes.CREATOR)
   async remove(@Param('id') id: Schema.Types.ObjectId): Promise<void> {
     return this.teamsService.remove(id);
+  }
+
+  @Post(':id')
+  @Roles(RolesTypes.CREATOR)
+  async restore(@Param('id') id: Schema.Types.ObjectId): Promise<void> {
+    return this.teamsService.restore(id);
   }
 
   @Get()

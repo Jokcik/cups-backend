@@ -20,15 +20,6 @@ export const TeamSchema = new mongoose.Schema({
   logo: {
     type: String
   },
-  chat: {
-    type: Number,
-    required: true
-  },
-  // Что за херня????
-  type: {
-    type: Boolean,
-    default: true
-  },
   players: [UserRelationSchema]
 });
 

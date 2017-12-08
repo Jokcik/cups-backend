@@ -3,8 +3,11 @@ export class CreateTeamDto {
   readonly url: string;
   readonly ei_creator: string;
   readonly status: number;
-  readonly players: number;
   readonly logo: string;
   readonly chat: number;
-  readonly users: string[];
+  readonly players: string[];
+
+
+  readonly addPlayers: string[];
+  readonly removePlayers: string[];
 }
