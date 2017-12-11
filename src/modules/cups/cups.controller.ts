@@ -15,6 +15,12 @@ export class CupsController {
   constructor(private readonly cupsService: CupsService) {
   }
 
+
+  @Get('list')
+  async list(): Promise<any> {
+    return this.cupsService.list();
+  }
+
   @Get('view')
   async findCupsGoes(@Request() req): Promise<any> {
     let goes = await this.cupsService.findCupsGoes();
@@ -88,6 +94,5 @@ export class CupsController {
   async removeJudge(@Param('cupId') id: ObjectId, @Body('judge') judge: ObjectId, @Request() req): Promise<any> {
     return this.cupsService.removeJudge(id, judge);
   }
-
 
 }

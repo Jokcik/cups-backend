@@ -1,12 +1,11 @@
 import * as passport from 'passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import {ExtractJwt, Strategy} from 'passport-jwt';
 import {Component, Inject} from '@nestjs/common';
 import {UserModelToken} from '../core/constants';
 import {Model} from 'mongoose';
 import {User} from '../users/interfaces/user.interface';
-import {UserService} from './user.service';
-import Request = Express.Request;
 import {AUser} from './a-user';
+import Request = Express.Request;
 
 @Component()
 export class JwtStrategy extends Strategy {

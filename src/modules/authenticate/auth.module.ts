@@ -1,7 +1,4 @@
-import {
-  Module,
-  MiddlewaresConsumer,
-} from '@nestjs/common';
+import {Module,} from '@nestjs/common';
 import {JwtStrategy} from './jwt.strategy';
 import {usersProviders} from '../users/users.providers';
 import {DatabaseModule} from '../database/database.module';

@@ -15,6 +15,7 @@ import {TeamShort} from "../teams/interfaces/team.interface";
 import ObjectId = Schema.Types.ObjectId;
 import {LongCup, ShortCup} from "./interfaces/cup.interface";
 import {CupPlayer} from "./interfaces/cup-player";
+import fetch from "node-fetch";
 
 @Component()
 export class CupsService {
@@ -189,5 +190,21 @@ export class CupsService {
         {ei_creator: user.id},
         {'players.id': user.id}
       ])
+  }
+
+  async list() {
+    let cup = await fetch('https://goodgame.ru/api/4/cups/list')
+      .then(res => res.json())
+      .then(res => res.opened);
+
+    cup.map(c => {
+      delete c.id;
+      delete c.game;
+      c.start = +c.start * 1000;
+      c.url = this.ggUtils.translit(c.title);
+    });
+    let all = cup.map(cup => this.cupModel.findOneAndUpdate({title: cup.title}, cup, {upsert: true, new: true}));
+
+    return await Promise.all(all);
   }
 }
