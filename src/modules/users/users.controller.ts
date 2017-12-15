@@ -1,4 +1,4 @@
-import {Controller, Get, Param, Query} from '@nestjs/common';
+import {Controller, Get, Param, Query, Request} from '@nestjs/common';
 import {UsersService} from './users.service';
 import {User} from './interfaces/user.interface';
 import {Schema} from 'mongoose';
@@ -23,6 +23,11 @@ export class UsersController {
   @Get('players')
   async findPlayers(@Query('q') search: string, @Query('limit') limit: number): Promise<any> {
     return this.usersService.findPlayers(search ? search : '', +limit ? +limit : 10);
+  }
+
+  @Get('teams')
+  async findTeamsCurrentUser(@Request() req): Promise<TeamShort[]> {
+    return this.usersService.findTeams(req.user.id);
   }
 
   @Get(':id')

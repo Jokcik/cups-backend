@@ -17,18 +17,24 @@ export class CupsController {
 
 
   @Get('list')
-  async list(): Promise<any> {
-    return this.cupsService.list();
+  async list(@Request() req): Promise<any> {
+    return this.cupsService.list(req.user);
+  }
+
+  @Get('old-cups')
+  async oldCups(@Query('search') search, @Query('page') page): Promise<any> {
+    return await this.cupsService.findCupsClosed(search, +page);
   }
 
   @Get('view')
   async findCupsGoes(@Request() req): Promise<any> {
+    console.log('findCupsGoes', req.user)
     let goes = await this.cupsService.findCupsGoes();
-    let closed = await this.cupsService.findCupsClosed();
+    // let closed = await this.cupsService.findCupsClosed();
     let opened = await this.cupsService.findCupsOpened();
     let myCups = await this.cupsService.findMyCups(req.user);
 
-    return {goes, closed, opened, myCups};
+    return {goes, opened, myCups};
   }
 
   @Post()
@@ -43,9 +49,15 @@ export class CupsController {
   }
 
   @Delete(':cupId')
-  @Roles(RolesTypes.JUDGES)
+  @Roles(RolesTypes.CREATOR)
   async remove(@Param('cupId') id: ObjectId): Promise<void> {
     return this.cupsService.remove(id);
+  }
+
+  @Post(':cupId/restore')
+  @Roles(RolesTypes.CREATOR)
+  async restore(@Param('cupId') id: ObjectId): Promise<void> {
+    return this.cupsService.restore(id);
   }
 
   @Get()
@@ -87,6 +99,12 @@ export class CupsController {
   @Roles(RolesTypes.CREATOR)
   async addJudge(@Param('cupId') id: ObjectId, @Body('judge') judge: ObjectId, @Request() req): Promise<any> {
     return this.cupsService.addJudge(id, judge);
+  }
+
+  @Post(':cupId/publish')
+  @Roles(RolesTypes.CREATOR)
+  async publish(@Param('cupId') id: ObjectId): Promise<any> {
+    return this.cupsService.publish(id);
   }
 
   @Delete(':cupId/judge')

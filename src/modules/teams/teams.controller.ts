@@ -1,10 +1,10 @@
 import {Controller, Get, Post, Body, Param, Request, Put, Delete, Query, UseGuards} from '@nestjs/common';
 import {CreateTeamDto} from './dto/create-team.dto';
 import {TeamsService} from './teams.service';
-import {Schema} from 'mongoose';
 import {Roles, RolesTypes} from '../core/constants';
 import {TeamShort} from "./interfaces/team.interface";
 import {TeamsRolesGuard} from "./teams-roles.guard";
+import {Schema} from 'mongoose';
 import ObjectId = Schema.Types.ObjectId;
 
 @Controller('teams')

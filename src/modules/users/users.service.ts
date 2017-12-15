@@ -45,6 +45,7 @@ export class UsersService {
   }
 
   async findTeams(id: ObjectId): Promise<TeamShort[]> {
+    console.log('123');
     return await this.teamModel.find({'players.player': {$in: [id]}});
   }
 

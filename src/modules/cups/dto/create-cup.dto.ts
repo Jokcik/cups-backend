@@ -7,6 +7,7 @@ export class CreateCupDto {
   readonly type: number;
   readonly url: string;
   readonly start: string;
+  readonly status: number;
   readonly logo: string;
   readonly ei_creator: string;
   readonly ei_created: number;

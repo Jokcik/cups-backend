@@ -38,6 +38,10 @@ export const CupSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  status: {
+    type: Number,
+    default: 0
+  },
   logo: String,
   ei_creator: {
     type: String,

@@ -10,7 +10,7 @@ import {TeamsService} from '../teams/teams.service';
 import {UsersService} from '../users/users.service';
 import {TeamShort} from "../teams/interfaces/team.interface";
 import ObjectId = Schema.Types.ObjectId;
-import {ShortCup} from "./interfaces/cup.interface";
+import {LongCup, ShortCup} from "./interfaces/cup.interface";
 
 @Component()
 export class PlayersService {
@@ -56,6 +56,7 @@ export class PlayersService {
       await this.validPlayerTeam(player, playerJoin);
     }
 
+
     let cupPlayer = this.getPlayerByCupType(cup, playerJoin, isAdmin);
 
     if (this.isPlayer(cup, cupPlayer.id)) {
@@ -65,10 +66,11 @@ export class PlayersService {
     return cupPlayer;
   }
 
-  public async basicValidPlayer(cup: ShortCup, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean) {
+  public async basicValidPlayer(cup: ShortCup | LongCup, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean) {
     let player;
     if (cup.type == PlayersTypes.SOLO) {
-      player = isAdmin ? await this.validPlayerUser(playerJoin) : await this.usersService.findById(currentUserId);
+      player = isAdmin && playerJoin.user ? await this.validPlayerUser(playerJoin) : await this.usersService.findById(currentUserId);
+      playerJoin.user = playerJoin.user ? playerJoin.user : currentUserId;
     } else {
       player = await this.teamsService.findById(playerJoin.team);
       if (!player) throw new BadRequestException('error team id');

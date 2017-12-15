@@ -75,7 +75,9 @@ export class CupsService {
 
   async findAll(url: string, long: boolean): Promise<ShortCup[]> {
     if (url && long) {
-      let cup = await this.cupModel.findOne({url}).populate('game');
+      let cup = await this.cupModel.findOne({url}).populate('game')
+        .populate({path: 'ei_creator', model: UserModelName})
+        .populate({path: 'judges', model: UserModelName});
       return [await this.populatePlayers(cup)];
     }
 
@@ -83,7 +85,14 @@ export class CupsService {
   }
 
   async remove(id: ObjectId): Promise<any> {
-    return this.cupModel.remove({_id: id})
+    return this.cupModel.findByIdAndUpdate(id, {deleted: true}, {new: true});
+    // return this.cupModel.remove({_id: id})
+  }
+
+
+  async restore(id: ObjectId): Promise<any> {
+    return this.cupModel.findByIdAndUpdate(id, {deleted: false}, {new: true});
+    // return this.cupModel.remove({_id: id})
   }
 
   async addPlayer(id: ObjectId, currentUser: AUser, playerJoin: PlayerJoin): Promise<CupPlayer[]> {
@@ -119,7 +128,7 @@ export class CupsService {
 
   async checkInPlayer(id: ObjectId, user: AUser, playerJoin: PlayerJoin) {
     let isAdmin = user.isJudge();
-    let cup = await this.cupModel.findById(id);
+    let cup = await this.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 
     let player = await this.playersService.basicValidPlayer(cup, playerJoin, user.id, isAdmin);
@@ -171,9 +180,13 @@ export class CupsService {
       .where('start').lt(Date.now());
   }
 
-  async findCupsClosed() {
+  async findCupsClosed(search: string, page: number) {
+    let limit = 30;
     return this.cupModel.find()
       .where('closed', true)
+      .where({title: { $regex: search, $options: 'i' } })
+      .skip((page - 1) * limit)
+      .limit(limit)
   }
 
   async findCupsOpened() {
@@ -182,9 +195,12 @@ export class CupsService {
       .where('start').gt(Date.now());
   }
 
+  async publish(id: ObjectId) {
+    return await this.cupModel.findByIdAndUpdate(id, {status: 2}, {new: true});
+  }
+
   async findMyCups(user: AUser) {
     if (!user) return [];
-
     return this.cupModel.find()
       .or([
         {ei_creator: user.id},
@@ -192,19 +208,25 @@ export class CupsService {
       ])
   }
 
-  async list() {
-    let cup = await fetch('https://goodgame.ru/api/4/cups/list')
+  async list(user) {
+    let cup = await fetch('https://goodgame.ru/ajax/cups/list/oldcups/?page=2')
       .then(res => res.json())
-      .then(res => res.opened);
+      // .then(res => res.myCups);
 
     cup.map(c => {
       delete c.id;
       delete c.game;
       c.start = +c.start * 1000;
       c.url = this.ggUtils.translit(c.title);
+      if (+c.prize_fund) {
+        c.prize_pool = {amount: c.prize_fund};
+      }
+      // c.ei_creator = user.id;
+      c.type = +c.participants_type - 1;
     });
     let all = cup.map(cup => this.cupModel.findOneAndUpdate({title: cup.title}, cup, {upsert: true, new: true}));
 
     return await Promise.all(all);
+    // return await Promise.all([]);
   }
 }

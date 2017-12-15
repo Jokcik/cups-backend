@@ -10,6 +10,7 @@ interface Cup extends Document {
   readonly description: string;
   readonly type: number;
   readonly url: string;
+  readonly status: number;
   readonly start: Date;
   readonly logo: string;
   readonly ei_creator: string;
