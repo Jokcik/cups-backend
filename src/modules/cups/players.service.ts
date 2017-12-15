@@ -47,6 +47,7 @@ export class PlayersService {
   }
 
   public async playerValidate(id: ObjectId, playerJoin: PlayerJoin, currentUserId: string, isAdmin: boolean = false): Promise<CupPlayer> {
+    let checkIn = !!(isAdmin && (playerJoin.user  || playerJoin.team));
     let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 
@@ -56,8 +57,7 @@ export class PlayersService {
       await this.validPlayerTeam(player, playerJoin);
     }
 
-
-    let cupPlayer = this.getPlayerByCupType(cup, playerJoin, isAdmin);
+    let cupPlayer = this.getPlayerByCupType(cup, playerJoin, checkIn);
 
     if (this.isPlayer(cup, cupPlayer.id)) {
       throw new BadRequestException('Duplicate data');

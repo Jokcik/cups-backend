@@ -128,18 +128,20 @@ export class CupsService {
 
   async checkInPlayer(id: ObjectId, user: AUser, playerJoin: PlayerJoin) {
     let isAdmin = user.isJudge();
-    let cup = await this.findById(id);
+    let cup = await this.cupModel.findById(id);
     if (!cup) throw new BadRequestException('invalid cup');
 
-    let player = await this.playersService.basicValidPlayer(cup, playerJoin, user.id, isAdmin);
 
+    let player = await this.playersService.basicValidPlayer(cup, playerJoin, user.id, isAdmin);
+    console.log('checkInPlayer', cup);
     cup.players.forEach(value => {
       if (value.id == player.id) {
         (<any>value).checkIn = true;
       }
     });
 
-    return await this.cupModel.findByIdAndUpdate(id, cup, {new: true});
+    return await this.cupModel.findByIdAndUpdate(id, cup, {new: true})
+      .then(cup => cup.players);
   }
 
   async addJudge(id: ObjectId, judgeId: ObjectId) {
@@ -154,6 +156,8 @@ export class CupsService {
     }
 
     return await this.cupModel.findByIdAndUpdate(id, {$push: {judges: judgeId}}, {upsert: true, new: true})
+      .populate({path: 'judges', model: UserModelName})
+      .then(cup => cup.judges);
   }
 
   async removeJudge(id: ObjectId, judgeId: ObjectId) {
@@ -168,6 +172,8 @@ export class CupsService {
     }
 
     return await this.cupModel.findByIdAndUpdate(id, {$pull: {judges: judgeId}}, {upsert: true, new: true})
+      .populate({path: 'judges', model: UserModelName})
+      .then(cup => cup.judges);
   }
 
   async findJudge(id: ObjectId): Promise<User[]> {
@@ -184,7 +190,7 @@ export class CupsService {
     let limit = 30;
     return this.cupModel.find()
       .where('closed', true)
-      .where({title: { $regex: search, $options: 'i' } })
+      .where({title: {$regex: search, $options: 'i'}})
       .skip((page - 1) * limit)
       .limit(limit)
   }
@@ -211,7 +217,7 @@ export class CupsService {
   async list(user) {
     let cup = await fetch('https://goodgame.ru/ajax/cups/list/oldcups/?page=2')
       .then(res => res.json())
-      // .then(res => res.myCups);
+    // .then(res => res.myCups);
 
     cup.map(c => {
       delete c.id;
