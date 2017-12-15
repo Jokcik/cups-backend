@@ -19,7 +19,7 @@ import fetch from "node-fetch";
 
 @Component()
 export class CupsService {
-  private updateFields = ['description', 'type', 'url', 'start', 'logo', 'prize_pool',
+  private updateFields = ['description', 'title', 'type', 'url', 'start', 'logo', 'prize_pool',
     'chat', 'game', 'closed', 'invites', 'hidden', 'deleted'];
 
   constructor(@Inject(CupModelToken) private readonly cupModel: Model<ShortCup>,
